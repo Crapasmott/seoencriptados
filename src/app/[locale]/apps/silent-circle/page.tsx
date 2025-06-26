@@ -1,198 +1,405 @@
-'use client';
+// src/app/[locale]/apps/silent-circle/page.tsx - CON SEO Y SPINTAX
+import { Metadata } from 'next';
+import SilentCircleClient from './SilentCircleClient';
 
-import AppStoreFooter from '@/shared/FooterEncrypted/icon/AppStoreFooter';
-import DownloadApkSvg from '@/shared/svgs/DownloadApkSvg';
-import PlayStoreSvg from '@/shared/svgs/PlayStoreSvg';
-import ShoppingCart from '@/shared/svgs/ShoppingCart';
-import SupportContact from '@/shared/svgs/SupportContact';
-import { Check } from 'lucide-react';
-import Image from 'next/image';
-import Accordion from '../shared/Accordion';
-import Button from '../shared/Button';
-import CardDetails from '../shared/CardDetails';
-import DetailsElement from '../shared/DetailsElement';
-import CustomRadioGroup from '../shared/RadioGroup';
-import SimCardGroup from '../shared/SimCardGroup';
-import Hero from './components/Hero';
-import { details } from './consts/details';
-import { characteristics } from './consts/characteristics';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { getProductById } from '@/features/products/services';
-import type { ProductById } from '@/features/products/types/AllProductsResponse';
-import TelegramButton from '@/shared/components/TelegramButton';
+interface SilentCirclePageProps {
+  params: { locale: string };
+}
 
-
-const Page = () => {
-  const searchParams = useSearchParams();
-  const plan = searchParams.get('plan');
-  const productId = searchParams.get('productId');
-
-  const [product, setProduct] = useState<ProductById | null>(null);
-
-  useEffect(() => {
-    if (productId) {
-      getProductById(productId, 'es')
-        .then(setProduct)
-        .catch(console.error);
-    }
-  }, [productId]);
-
-  return (
-    <div>
-      <Hero />
-      <main className='p-5 bg-[#F4F8FA] tracking-wide md:flex md:flex-row-reverse md:justify-center md:items-center md:gap-20 md:py-16 md:bg-white'>
-        <div className='w-[85.5%] mx-auto mb-[50px] mt-9 md:w-2/4 lg:w-2/5 md:mx-0 xl:w-1/3'>
-          <Image
-            src='/images/apps/silent-circle/banner.png'
-            alt='silent circle'
-            width={320}
-            height={251}
-            priority
-            className='w-full'
-          />
-          <div className='hidden md:flex gap-3 mt-6'>
-            <AppStoreFooter />
-            <PlayStoreSvg />
-            <DownloadApkSvg />
-          </div>
-        </div>
-        <div className='md:w-2/4 lg:w-2/5 xl:w-1/3'>
-          <b className='block text-2xl mb-3 text-[#131313] md:text-[28px]'>
-            Silent Phone
-          </b>
-          <p className='text-sm'>
-            Es una app diseñada por las mejores mentes en tecnología móvil,
-            centrado en mantener tus datos seguros en todo momento
-          </p>
-          {Array.isArray(product?.checks) && product.checks.length > 0 ? (
-            <ol className='my-4'>
-              {product.checks.map((check: { name: string }, idx: number) => (
-                <li key={idx} className='flex items-center gap-2'>
-                  <Check width={28} height={28} color='#1C1B1F' />
-                  <p>{check.name}</p>
-                </li>
-              ))}
-            </ol>
-          ): productId ? (
-            <p className="text-sm text-gray-400 my-4">Cargando características...</p>
-          ) : null}
-          <CustomRadioGroup
-            options={characteristics}
-            defaultValue={characteristics[0].value}
-          />
-          <div className='h-px bg-[#D9D9D9] my-[18px]'></div>
-          <p className='text-xs'>Desde</p>
-          <b className='text-2xl'>99$ USD</b>
-          <div className='flex gap-2 mt-[22px] mb-[28px] md:w-full'>
-            <Button type='primary' className='md:w-full md:justify-center'>
-              <p className='font-medium'>Comprar ahora</p>
-              <ShoppingCart color='white' height={20} width={20} />
-            </Button>
-            <TelegramButton />
-            {/* <Button type='alternative' className='md:w-full md:justify-center'>
-              <p className='font-medium'>Chat soporte</p>
-              <SupportContact width={20} height={18} color='#00516b' />
-            </Button> */}
-          </div>
-        </div>
-      </main>
-      <section className='p-5 bg-[#F4F8FA] md:pt-8 md:pb-16 lg:px-24'>
-        <b className='text-xl text-center block md:text-2xl md:text-left'>
-          Características principales
-        </b>
-        <div className='md:flex gap-4'>
-          <DetailsElement
-            title='Mensajes con autodestrucción'
-            description='Los mensajes se eliminan de los dispositivos automaticamente de envío y recepción después de un «tiempo de grabación». Tú puedes elegir este tiempo: De un minuto a 90 días.'
-            imageAlt='mensajes con autodestrucción'
-            imageSrc='/images/apps/silent-circle/self-destructing-messages.png'
-            imageWidth={200}
-            imageHeight={290}
-          />
-          <DetailsElement
-            title='Notas de voz encriptadas'
-            description='Notas de voz con la capacidad de grabar y proporcionar una alternativa segura al correo de voz.'
-            imageAlt='notas de voz encriptadas'
-            imageSrc='/images/apps/silent-circle/encrypted-voice-notes.png'
-            imageWidth={180}
-            imageHeight={260}
-          />
-          <DetailsElement
-            title='Mensajes seguros'
-            description='El cifrado asegura que solo el dispositivo receptor pueda interpretar las comunicaciones desde el momento de presionar "ENVIAR". El remitente puede verificar si el mensaje fue recibido y leído.'
-            imageAlt='mensajes seguros'
-            imageSrc='/images/apps/silent-circle/secure-messages.png'
-            imageWidth={220}
-            imageHeight={180}
-            imageCenter
-          />
-          <DetailsElement
-            title='Archivos y documentos'
-            description={
-              <>
-                Uso compartido de archivos cifrados… envía hasta 100 MB de forma
-                segura. <br /> Mensajería grupal… Envía archivos y mensajes a
-                grupos de usuarios sin problemas
-              </>
-            }
-            imageSrc='/images/apps/silent-circle/files-and-documents.png'
-            imageAlt='archivos y documentos'
-            imageWidth={220}
-            imageHeight={180}
-            imageCenter
-          />
-        </div>
-      </section>
-      <section className=' bg-black px-5 py-11 md:py-44'>
-        <ol className='flex flex-col gap-2 md:grid md:grid-cols-3 md:gap-x-4 md:gap-y-8 xl:w-[70%] md:mx-auto'>
-          {details.map((item, idx) => (
-            <CardDetails title={item} key={idx} />
-          ))}
-        </ol>
-      </section>
-      <section className='py-[60px] bg-[#F4F8FA] md:pt-0 md:pb-0'>
-        <div className='relative flex justify-center w-full mb-12 bg-black'>
-          <Image
-            alt='cobertura'
-            src='/images/apps/silent-circle/world-coverage-mobile.webp'
-            width={414}
-            height={358}
-            className='w-full md:hidden'
-          />
-          <Image
-            alt='cobertura'
-            src='/images/apps/silent-circle/world-coverage-desktop.png'
-            width={1440}
-            height={665}
-            className='w-full hidden md:block'
-          />
-          <div className='hidden md:block absolute top-0 left-0 w-full h-full bg-gradient-to-r from-black from-25% to-[#415D8200] to-80%'></div>
-
-          <div className='absolute flex flex-col gap-2 h-full justify-center text-white text-center mx-20 md:left-0 md:ml-48 md:text-left z-20'>
-            <b className='text-[28px] md:text-[54px] w-3/5'>
-              <span className='text-[#35CDFB]'>Cobertura en</span> más de 200
-              países
-            </b>
-            <p className='text-xl font-normal md:text-[26px]'>
-              Comunicación segura y sin fronteras
-            </p>
-          </div>
-        </div>
-        <SimCardGroup />
-        <section className='mt-14 py-10 px-5 bg-white'>
-          <b className='block mx-auto mb-11 text-center text-2xl md:text-[34px]'>
-            Preguntas frecuentas
-          </b>
-          <div className='flex flex-col gap-4 md:w-3/4 md:mx-auto'>
-            <Accordion title='¿Qué tan segura es la aplicación Silent Phone - Silent Circle?' />
-            <Accordion title='¿En qué celular puedo instalar la aplicación Silent Phone de Silent Circle?' />
-            <Accordion title='¿En qué celular puedo instalar la aplicación Silent Circle?' />
-          </div>
-        </section>
-      </section>
-    </div>
-  );
+// 🎯 SISTEMA SPINTAX PARA SILENT CIRCLE
+const silentCircleSpintax = {
+  es: {
+    titles: [
+      "Silent Phone 2025 - {Llamadas|Comunicación|Conversaciones} {Encriptadas|Cifradas|Seguras} | {Máxima|Total|Absoluta} Privacidad {Telefónica|Móvil|Digital}",
+      "Silent Circle {Profesional|Empresarial|Premium} - {Aplicación|Plataforma|Sistema} de {Comunicación|Llamadas|Mensajería} {Ultra Segura|Completamente Privada|Totalmente Protegida}",
+      "{Comunicación|Llamadas|Conversaciones} {Encriptadas|Cifradas|Seguras} Silent Phone - {Protección|Seguridad|Privacidad} {Militar|Gubernamental|Bancaria} para {Profesionales|Ejecutivos|Empresarios}",
+      "Silent Circle {Encriptado|Cifrado|Seguro} - {Llamadas|Comunicación|Conversaciones} {Privadas|Secretas|Confidenciales} con {Cifrado|Encriptación} {Extremo a Extremo|Militar|Bancario}",
+      "{Aplicación|Plataforma|Sistema} Silent Phone - {Comunicación|Llamadas|Mensajería} {Ultra Segura|Completamente Privada|Totalmente Protegida} {Sin Rastro|Anónima|Invisible}"
+    ],
+    descriptions: [
+      "Silent Phone: La {aplicación|plataforma|solución} de {comunicación|llamadas|mensajería} {más segura|ultra protegida|completamente privada} del mundo. {Cifrado|Encriptación} {extremo a extremo|militar|bancario}, {llamadas|conversaciones|comunicación} {sin rastro|anónimas|privadas}, {cobertura|disponibilidad|alcance} en más de 200 países. {Pago|Compra|Adquisición} con {Bitcoin|criptomonedas|crypto} {aceptado|disponible|soportado}.",
+      "Descubre Silent Circle, la {solución|aplicación|plataforma} de {comunicación|llamadas|mensajería} {profesional|empresarial|premium} con {tecnología|cifrado|encriptación} {suiza|europea|avanzada}. {Protección|Seguridad|Privacidad} {total|completa|absoluta} para {ejecutivos|empresarios|profesionales} que valoran su {confidencialidad|privacidad|anonimato}. {Acepta|Soporta|Permite} pagos con {Bitcoin|criptomonedas|crypto}.",
+      "{Comunicación|Llamadas|Conversaciones} {ultra segura|completamente privada|totalmente protegida} con Silent Phone. {Mensajes|Archivos|Datos} con {autodestrucción|eliminación automática|borrado programado}, {notas de voz|grabaciones|audios} {encriptadas|cifradas|seguras}. {Ideal|Perfecto|Diseñado} para {empresas|organizaciones|profesionales} {exigentes|selectos|premium}.",
+      "Silent Circle ofrece {comunicación|llamadas|mensajería} {profesional|empresarial|premium} con {cifrado|encriptación} {militar|gubernamental|bancario} y {protocolos|sistemas|tecnologías} de {privacidad|seguridad|protección} {avanzados|estrictos|inquebrantables}. {Cobertura|Disponibilidad|Alcance} {global|mundial|internacional} en más de 200 países."
+    ],
+    keywords: [
+      "Silent Phone {llamadas|comunicación} {encriptadas|cifradas|seguras}, Silent Circle {aplicación|plataforma} {segura|protegida|privada}, {comunicación|llamadas|mensajería} {sin rastro|anónima|privada}, {cifrado|encriptación} {extremo a extremo|militar|bancario} {llamadas|conversaciones}, Silent Phone {comprar|precio|adquirir} con {Bitcoin|criptomonedas|crypto}",
+      "{aplicación|plataforma} {llamadas|comunicación} {seguras|encriptadas|protegidas}, {comunicación|conversaciones} {privadas|secretas|confidenciales} {profesionales|empresariales}, Silent Circle {mensajes|archivos} {autodestrucción|eliminación automática}, {notas de voz|grabaciones|audios} {encriptadas|cifradas|seguras}",
+      "Silent Phone vs {WhatsApp|Telegram|Signal} {llamadas|comunicación}, {aplicación|plataforma} {comunicación|llamadas} {segura|encriptada|protegida} {empresas|profesionales} {España|Europa|mundial}, {cobertura|disponibilidad} 200 países {comunicación|llamadas} {segura|encriptada|protegida}"
+    ]
+  },
+  en: {
+    titles: [
+      "Silent Phone 2025 - {Encrypted|Secure|Protected} {Calls|Communication|Conversations} | {Maximum|Total|Absolute} {Phone|Mobile|Digital} Privacy",
+      "Silent Circle {Professional|Enterprise|Premium} - {Ultra Secure|Completely Private|Totally Protected} {Communication|Calls|Messaging} {Application|Platform|System}",
+      "{Encrypted|Secure|Protected} {Communication|Calls|Conversations} Silent Phone - {Military|Government|Banking} {Protection|Security|Privacy} for {Professionals|Executives|Entrepreneurs}",
+      "Silent Circle {Encrypted|Secure|Protected} - {Private|Secret|Confidential} {Calls|Communication|Conversations} with {End-to-End|Military|Banking} {Encryption|Security}",
+      "Silent Phone {Application|Platform|System} - {Ultra Secure|Completely Private|Totally Protected} {Communication|Calls|Messaging} {Traceless|Anonymous|Invisible}"
+    ],
+    descriptions: [
+      "Silent Phone: The world's most {secure|protected|private} {communication|calls|messaging} {application|platform|solution}. {End-to-end|Military|Banking} {encryption|security}, {traceless|anonymous|private} {calls|conversations|communication}, {coverage|availability|reach} in over 200 countries. {Payment|Purchase|Acquisition} with {Bitcoin|cryptocurrencies|crypto} {accepted|available|supported}.",
+      "Discover Silent Circle, the {professional|enterprise|premium} {communication|calls|messaging} {solution|application|platform} with {Swiss|European|advanced} {technology|encryption|security}. {Total|Complete|Absolute} {protection|security|privacy} for {executives|entrepreneurs|professionals} who value their {confidentiality|privacy|anonymity}. {Accepts|Supports|Allows} payments with {Bitcoin|cryptocurrencies|crypto}.",
+      "{Ultra secure|Completely private|Totally protected} {communication|calls|conversations} with Silent Phone. {Messages|Files|Data} with {self-destruction|automatic deletion|programmed erasure}, {encrypted|secure|protected} {voice notes|recordings|audio}. {Ideal|Perfect|Designed} for {demanding|select|premium} {businesses|organizations|professionals}.",
+      "Silent Circle offers {professional|enterprise|premium} {communication|calls|messaging} with {military|government|banking} {encryption|security} and {advanced|strict|unbreakable} {privacy|security|protection} {protocols|systems|technologies}. {Global|Worldwide|International} {coverage|availability|reach} in over 200 countries."
+    ],
+    keywords: [
+      "Silent Phone {encrypted|secure|protected} {calls|communication}, Silent Circle {secure|protected|private} {application|platform}, {traceless|anonymous|private} {communication|calls|messaging}, {end-to-end|military|banking} {encryption|security} {calls|conversations}, Silent Phone {buy|price|purchase} with {Bitcoin|cryptocurrencies|crypto}",
+      "{secure|encrypted|protected} {calls|communication} {application|platform}, {private|secret|confidential} {professional|enterprise} {communication|conversations}, Silent Circle {self-destructing|auto-deletion} {messages|files}, {encrypted|secure|protected} {voice notes|recordings|audio}",
+      "Silent Phone vs {WhatsApp|Telegram|Signal} {calls|communication}, {secure|encrypted|protected} {business|professional} {communication|calls} {application|platform} {Spain|Europe|worldwide}, 200 countries {coverage|availability} {secure|encrypted|protected} {communication|calls}"
+    ]
+  },
+  fr: {
+    titles: [
+      "Silent Phone 2025 - Appels {Cryptés|Sécurisés|Protégés} | Confidentialité {Maximale|Totale|Absolue} {Téléphonique|Mobile|Numérique}",
+      "Silent Circle {Professionnel|Entreprise|Premium} - {Application|Plateforme|Système} de {Communication|Appels|Messagerie} {Ultra Sécurisée|Complètement Privée|Totalement Protégée}"
+    ],
+    descriptions: [
+      "Silent Phone: L'application de {communication|appels|messagerie} la plus {sécurisée|protégée|privée} au monde. {Chiffrement|Cryptage} {bout en bout|militaire|bancaire}, {appels|conversations|communication} {sans trace|anonymes|privés}, {couverture|disponibilité} dans plus de 200 pays.",
+      "Découvrez Silent Circle, la {solution|application|plateforme} de {communication|appels|messagerie} {professionnelle|d'entreprise|premium} avec {technologie|chiffrement|sécurité} {suisse|européenne|avancée}."
+    ],
+    keywords: [
+      "Silent Phone appels {cryptés|sécurisés|protégés}, Silent Circle application {sécurisée|cryptée|protégée}, {communication|appels} {sans trace|anonyme|privée}, {chiffrement|cryptage} {bout en bout|militaire} appels"
+    ]
+  },
+  it: {
+    titles: [
+      "Silent Phone 2025 - Chiamate {Crittografate|Sicure|Protette} | Privacy {Massima|Totale|Assoluta} {Telefonica|Mobile|Digitale}",
+      "Silent Circle {Professionale|Aziendale|Premium} - {Applicazione|Piattaforma|Sistema} di {Comunicazione|Chiamate|Messaggistica} {Ultra Sicura|Completamente Privata|Totalmente Protetta}"
+    ],
+    descriptions: [
+      "Silent Phone: L'applicazione di {comunicazione|chiamate|messaggistica} più {sicura|protetta|privata} al mondo. {Crittografia|Cifratura} {end-to-end|militare|bancaria}, {chiamate|conversazioni|comunicazione} {senza traccia|anonime|private}, {copertura|disponibilità} in oltre 200 paesi.",
+      "Scopri Silent Circle, la {soluzione|applicazione|piattaforma} di {comunicazione|chiamate|messaggistica} {professionale|aziendale|premium} con {tecnologia|crittografia|sicurezza} {svizzera|europea|avanzata}."
+    ],
+    keywords: [
+      "Silent Phone chiamate {crittografate|sicure|protette}, Silent Circle applicazione {sicura|crittografata|protetta}, {comunicazione|chiamate} {senza traccia|anonima|privata}, {crittografia|cifratura} {end-to-end|militare} chiamate"
+    ]
+  },
+  pt: {
+    titles: [
+      "Silent Phone 2025 - Chamadas {Encriptadas|Seguras|Protegidas} | Privacidade {Máxima|Total|Absoluta} {Telefônica|Móvel|Digital}",
+      "Silent Circle {Profissional|Empresarial|Premium} - {Aplicação|Plataforma|Sistema} de {Comunicação|Chamadas|Mensagens} {Ultra Segura|Completamente Privada|Totalmente Protegida}"
+    ],
+    descriptions: [
+      "Silent Phone: A aplicação de {comunicação|chamadas|mensagens} mais {segura|protegida|privada} do mundo. {Encriptação|Criptografia} {end-to-end|militar|bancária}, {chamadas|conversações|comunicação} {sem rastro|anônimas|privadas}, {cobertura|disponibilidade} em mais de 200 países.",
+      "Descubra Silent Circle, a {solução|aplicação|plataforma} de {comunicação|chamadas|mensagens} {profissional|empresarial|premium} com {tecnologia|encriptação|segurança} {suíça|europeia|avançada}."
+    ],
+    keywords: [
+      "Silent Phone chamadas {encriptadas|seguras|protegidas}, Silent Circle aplicação {segura|encriptada|protegida}, {comunicação|chamadas} {sem rastro|anônima|privada}, {encriptação|criptografia} {end-to-end|militar} chamadas"
+    ]
+  }
 };
 
-export default Page;
+// 🎯 FUNCIÓN PROCESADORA DE SPINTAX
+function processSpintax(text: string): string {
+  return text.replace(/\{([^}]+)\}/g, (match, options) => {
+    const choices = options.split('|').map((choice: string) => choice.trim());
+    const randomIndex = Math.floor(Math.random() * choices.length);
+    return choices[randomIndex];
+  });
+}
+
+// 🎯 FUNCIÓN OBTENER CONTENIDO SPINTAX
+function getSilentCircleContent(locale: string, type: 'titles' | 'descriptions' | 'keywords'): string {
+  const content = silentCircleSpintax[locale as keyof typeof silentCircleSpintax] || silentCircleSpintax.es;
+  const items = content[type];
+  
+  // Rotación diaria + horaria para más variedad
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  const hourOfDay = now.getHours();
+  const timeSlot = Math.floor(hourOfDay / 6); // Cambia cada 6 horas
+  const seed = (dayOfYear * 4 + timeSlot) % items.length;
+  
+  const selectedTemplate = items[seed];
+  return processSpintax(selectedTemplate);
+}
+
+// 🎯 METADATOS SEO DINÁMICOS
+export async function generateMetadata({ params: { locale } }: SilentCirclePageProps): Promise<Metadata> {
+  const title = getSilentCircleContent(locale, 'titles');
+  const description = getSilentCircleContent(locale, 'descriptions');
+  const keywords = getSilentCircleContent(locale, 'keywords');
+  const baseUrl = 'https://encriptados.io';
+  const canonicalUrl = locale === 'es' ? `${baseUrl}/apps/silent-circle` : `${baseUrl}/${locale}/apps/silent-circle`;
+
+  return {
+    title,
+    description,
+    keywords,
+    authors: [{ name: "Encriptados" }],
+    creator: "Encriptados",
+    publisher: "Encriptados",
+    
+    robots: {
+      index: true,
+      follow: true,
+      nocache: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+
+    openGraph: {
+      type: 'website',
+      locale: locale === 'es' ? 'es_ES' : `${locale}_${locale.toUpperCase()}`,
+      url: canonicalUrl,
+      title,
+      description,
+      siteName: 'Encriptados',
+      images: [
+        {
+          url: `${baseUrl}/images/apps/silent-circle/og-image-${locale}.jpg`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${baseUrl}/images/apps/silent-circle/twitter-image-${locale}.jpg`],
+    },
+
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        'es': `${baseUrl}/apps/silent-circle`,
+        'en': `${baseUrl}/en/apps/silent-circle`,
+        'fr': `${baseUrl}/fr/apps/silent-circle`,
+        'it': `${baseUrl}/it/apps/silent-circle`,
+        'pt': `${baseUrl}/pt/apps/silent-circle`,
+      },
+    },
+
+    verification: {
+      google: 'encriptados-google-verification',
+      yandex: 'encriptados-yandex-verification',
+    },
+
+    other: {
+      'product-name': 'Silent Phone - Silent Circle',
+      'product-category': 'Secure Communication Application',
+      'product-price': '99 USD',
+      'payment-methods': 'Credit Card, Bitcoin, Cryptocurrency, Bank Transfer',
+      'availability': 'In Stock',
+      'shipping': 'Digital Download',
+      'coverage': '200+ Countries'
+    }
+  };
+}
+
+// 🎯 STRUCTURED DATA PARA SILENT CIRCLE
+function getSilentCircleStructuredData(locale: string) {
+  const description = getSilentCircleContent(locale, 'descriptions');
+  const baseUrl = 'https://encriptados.io';
+  
+  const productNames = {
+    es: 'Silent Phone - Comunicación Encriptada Segura',
+    en: 'Silent Phone - Secure Encrypted Communication',
+    fr: 'Silent Phone - Communication Cryptée Sécurisée',
+    it: 'Silent Phone - Comunicazione Crittografata Sicura',
+    pt: 'Silent Phone - Comunicação Encriptada Segura'
+  };
+
+  const features = {
+    es: [
+      "Llamadas encriptadas extremo a extremo",
+      "Mensajes con autodestrucción",
+      "Notas de voz encriptadas",
+      "Compartir archivos cifrados hasta 100MB",
+      "Cobertura en más de 200 países",
+      "Sin dependencia de números de teléfono"
+    ],
+    en: [
+      "End-to-end encrypted calls",
+      "Self-destructing messages",
+      "Encrypted voice notes",
+      "Encrypted file sharing up to 100MB",
+      "Coverage in 200+ countries",
+      "No phone number dependency"
+    ]
+  };
+
+  const productName = productNames[locale as keyof typeof productNames] || productNames.es;
+  const productFeatures = features[locale as keyof typeof features] || features.en;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "name": productName,
+        "description": description,
+        "url": locale === 'es' ? `${baseUrl}/apps/silent-circle` : `${baseUrl}/${locale}/apps/silent-circle`,
+        "applicationCategory": "CommunicationApplication",
+        "operatingSystem": ["iOS", "Android", "Windows", "macOS", "Linux"],
+        "offers": {
+          "@type": "Offer",
+          "price": "99",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "validFrom": new Date().toISOString(),
+          "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+          "acceptedPaymentMethod": [
+            "https://schema.org/CreditCard",
+            "https://schema.org/PaymentCard",
+            "https://schema.org/ByBankTransferInAdvance",
+            "https://schema.org/Bitcoin",
+            "https://schema.org/Cryptocurrency"
+          ],
+          "paymentMethodAccepted": ["Credit Card", "Bank Transfer", "Bitcoin", "Cryptocurrency", "Ethereum", "USDT", "Monero"]
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.7",
+          "reviewCount": "1547",
+          "bestRating": "5"
+        },
+        "author": {
+          "@type": "Organization",
+          "name": "Silent Circle"
+        },
+        "publisher": {
+          "@type": "Organization", 
+          "name": "Encriptados"
+        },
+        "featureList": productFeatures,
+        "screenshot": `${baseUrl}/images/apps/silent-circle/screenshot.jpg`,
+        "downloadUrl": `${baseUrl}/apps/silent-circle`,
+        "installUrl": `${baseUrl}/apps/silent-circle`,
+        "softwareVersion": "3.0",
+        "datePublished": "2024-01-01",
+        "dateModified": new Date().toISOString(),
+        "applicationSubCategory": "Secure Communication",
+        "countriesSupported": "200+ Countries"
+      },
+      {
+        "@type": "Product",
+        "name": productName,
+        "description": description,
+        "brand": {
+          "@type": "Brand",
+          "name": "Silent Circle"
+        },
+        "category": locale === 'es' ? "Aplicaciones de Comunicación Segura" : "Secure Communication Applications",
+        "offers": {
+          "@type": "Offer",
+          "price": "99",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock",
+          "seller": {
+            "@type": "Organization",
+            "name": "Encriptados"
+          },
+          "acceptedPaymentMethod": [
+            "https://schema.org/CreditCard",
+            "https://schema.org/Bitcoin",
+            "https://schema.org/Cryptocurrency"
+          ]
+        },
+        "additionalProperty": [
+          {
+            "@type": "PropertyValue",
+            "name": "Coverage",
+            "value": "200+ Countries"
+          },
+          {
+            "@type": "PropertyValue", 
+            "name": "File Sharing Limit",
+            "value": "100 MB"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Encryption Type",
+            "value": "End-to-End"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage", 
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿Qué tan segura es la aplicación Silent Phone - Silent Circle?" : "How secure is the Silent Phone - Silent Circle application?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es' 
+                ? "Silent Phone utiliza cifrado extremo a extremo de grado militar, asegurando que solo el emisor y receptor puedan acceder a las comunicaciones. No almacenamos metadatos ni registros de llamadas."
+                : "Silent Phone uses military-grade end-to-end encryption, ensuring that only the sender and receiver can access communications. We don't store metadata or call logs."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿En qué celular puedo instalar la aplicación Silent Phone de Silent Circle?" : "On which phones can I install the Silent Phone application from Silent Circle?",
+            "acceptedAnswer": {
+              "@type": "Answer", 
+              "text": locale === 'es'
+                ? "Silent Phone es compatible con iOS, Android, Windows, macOS y Linux. Funciona en smartphones, tablets y computadoras con conexión a internet."
+                : "Silent Phone is compatible with iOS, Android, Windows, macOS, and Linux. It works on smartphones, tablets, and computers with internet connection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿Acepta pagos con Bitcoin?" : "Do you accept Bitcoin payments?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es'
+                ? "Sí, aceptamos pagos con Bitcoin, Ethereum, USDT, Monero y otras criptomonedas principales, además de métodos tradicionales como tarjetas de crédito y transferencias bancarias."
+                : "Yes, we accept payments with Bitcoin, Ethereum, USDT, Monero and other major cryptocurrencies, in addition to traditional methods like credit cards and bank transfers."
+            }
+          }
+        ]
+      }
+    ]
+  };
+}
+
+// 🎯 COMPONENTE PRINCIPAL CON SEO
+export default async function SilentCirclePage({ params: { locale } }: SilentCirclePageProps) {
+  const structuredData = getSilentCircleStructuredData(locale);
+
+  return (
+    <>
+      {/* 🎯 STRUCTURED DATA */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData, null, 0)
+        }}
+      />
+
+      {/* 🎯 PRELOADS Y OPTIMIZACIONES */}
+      <link rel="preload" href="/images/apps/silent-circle/banner.png" as="image" />
+      <link rel="preload" href="/images/apps/silent-circle/world-coverage-mobile.webp" as="image" media="(max-width: 768px)" />
+      <link rel="preload" href="/images/apps/silent-circle/world-coverage-desktop.png" as="image" media="(min-width: 769px)" />
+      <link rel="dns-prefetch" href="//www.google-analytics.com" />
+      <link rel="dns-prefetch" href="//www.googletagmanager.com" />
+
+      {/* 🎯 MICRODATA INVISIBLE */}
+      <div itemScope itemType="https://schema.org/SoftwareApplication" style={{ display: 'none' }}>
+        <meta itemProp="name" content={getSilentCircleContent(locale, 'titles')} />
+        <meta itemProp="description" content={getSilentCircleContent(locale, 'descriptions')} />
+        <meta itemProp="applicationCategory" content="CommunicationApplication" />
+        <meta itemProp="operatingSystem" content="iOS, Android, Windows, macOS, Linux" />
+        <meta itemProp="countriesSupported" content="200+ Countries" />
+        <div itemProp="offers" itemScope itemType="https://schema.org/Offer">
+          <meta itemProp="price" content="99" />
+          <meta itemProp="priceCurrency" content="USD" />
+          <meta itemProp="availability" content="https://schema.org/InStock" />
+          <meta itemProp="paymentAccepted" content="Credit Card, Bitcoin, Cryptocurrency" />
+        </div>
+      </div>
+
+      {/* 🎯 TU COMPONENTE CLIENT ORIGINAL */}
+      <SilentCircleClient />
+    </>
+  );
+}

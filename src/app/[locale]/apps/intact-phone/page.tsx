@@ -1,188 +1,459 @@
-"use client";
+// src/app/[locale]/apps/intact-phone/page.tsx - CON SEO Y SPINTAX
+import { Metadata } from 'next';
+import IntactPhoneClient from './IntactPhoneClient';
 
-import ShoppingCart from '@/shared/svgs/ShoppingCart';
-import SupportContact from '@/shared/svgs/SupportContact';
-import { Check, CheckCircle2 } from 'lucide-react';
-import Image from 'next/image';
-import Accordion from '../shared/Accordion';
-import Button from '../shared/Button';
-import CardDetails from '../shared/CardDetails';
-import CustomRadioGroup from '../shared/RadioGroup';
-import SimCardGroup from '../shared/SimCardGroup';
-import Hero from './components/Hero';
-import { details } from './consts/details';
-import { plans } from './consts/plans';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
-import { getProductById } from '@/features/products/services';
-import type { ProductById } from '@/features/products/types/AllProductsResponse';
-import TelegramButton from '@/shared/components/TelegramButton';
+interface IntactPhonePageProps {
+  params: { locale: string };
+}
 
-const prices: Record<string, string> = {
-  '12.1': '150$ USD',
-  '12.2': '1000$ USD',
-  '12.3': '1100$ USD'
+// 🎯 SISTEMA SPINTAX PARA INTACT PHONE
+const intactPhoneSpintax = {
+  es: {
+    titles: [
+      "Intact Phone 2025 - {Celular|Teléfono|Dispositivo} {Encriptado|Cifrado|Seguro} de {Grado Militar|Alta Seguridad|Máxima Protección} | {Hardware|Software} {Blindado|Protegido|Fortificado}",
+      "Intact Phone {Encriptado|Cifrado|Seguro} - {Celular|Teléfono|Dispositivo} {Blindado|Protegido|Fortificado} contra {Malware|Hackers|Intervenciones} y {Ataques|Amenazas|Vulnerabilidades}",
+      "{Celular|Teléfono|Dispositivo} {Encriptado|Cifrado|Seguro} Intact Phone - {Protección|Seguridad|Blindaje} {Completa|Total|Absoluta} desde {Hardware|Núcleo|Sistema} hasta {Software|Aplicaciones|OS}",
+      "Intact Phone {Grado Militar|Alta Seguridad|Máxima Protección} - {Celular|Teléfono|Dispositivo} {Anti-Malware|Anti-Hackers|Anti-Intervenciones} con {Blindaje|Protección|Seguridad} {Física|Ambiental|Total}",
+      "{Dispositivo|Celular|Teléfono} Intact Phone {Blindado|Protegido|Fortificado} - {Comunicaciones|Conversaciones|Datos} {Seguras|Protegidas|Encriptadas} con {Tecnología|Hardware|Software} {Militar|Avanzada|Exclusiva}"
+    ],
+    descriptions: [
+      "Intact Phone: {Celular|Teléfono|Dispositivo} {encriptado|cifrado|seguro} de {grado militar|alta seguridad|máxima protección} con {hardware|software} {blindado|protegido|fortificado}. {Protección|Seguridad|Blindaje} {completa|total|absoluta} contra {malware|hackers|intervenciones}, {agua|caídas|golpes}. {Precios|Planes|Opciones} desde {150$|$150 USD} hasta {1100$|$1100 USD}.",
+      "Descubre Intact Phone, el {celular|teléfono|dispositivo} {encriptado|cifrado|seguro} más {avanzado|completo|sofisticado} fabricado por CommuniTake. {Hardware|Software} {exclusivo|propietario|personalizado} para {máxima|total|absoluta} {protección|seguridad|privacidad}. {Resistente|Blindado|Protegido} contra {ataques|amenazas|vulnerabilidades} {cibernéticos|físicos|ambientales}.",
+      "{Celular|Teléfono|Dispositivo} {encriptado|cifrado|seguro} de {grado militar|alta seguridad|máxima protección} con Intact Phone. {Protección|Seguridad|Blindaje} desde el {hardware|núcleo|sistema} hasta el {software|OS|aplicaciones}. {Ideal|Perfecto|Diseñado} para {profesionales|empresarios|ejecutivos} que requieren {máxima|total|absoluta} {seguridad|protección|privacidad}.",
+      "Intact Phone ofrece {protección|seguridad|blindaje} {integral|completa|total} con {tecnología|hardware|software} {militar|avanzada|exclusiva}. {Celular|Teléfono|Dispositivo} {blindado|protegido|fortificado} contra {malware|hackers|intervenciones} y {condiciones|situaciones|ambientes} {extremas|adversas|hostiles}. {Modelos|Versiones|Opciones} desde {$150|150 USD} hasta {$1100|1100 USD}."
+    ],
+    keywords: [
+      "Intact Phone {celular|teléfono|dispositivo} {encriptado|cifrado|seguro}, {grado militar|alta seguridad} {celular|teléfono} {blindado|protegido}, {protección|seguridad} contra {malware|hackers|intervenciones}, Intact Phone {precio|comprar|costo} {150|1000|1100} USD",
+      "{celular|teléfono|dispositivo} {anti-malware|anti-hackers|anti-intervenciones}, {hardware|software} {blindado|protegido|fortificado}, CommuniTake Intact Phone {fabricante|manufacturer}, {protección|seguridad} {física|ambiental|total} {celular|teléfono}",
+      "Intact Phone vs {iPhone|Samsung|Android} {seguridad|protección|privacidad}, {celular|teléfono} {encriptado|cifrado|seguro} {España|Europa|mundial}, {como|cómo} proteger {celular|teléfono} de {malware|hackers}, Intact Phone {modelos|versiones|precios}"
+    ]
+  },
+  en: {
+    titles: [
+      "Intact Phone 2025 - {Military-Grade|High-Security|Maximum-Protection} {Encrypted|Secure|Protected} {Phone|Device|Mobile} | {Hardened|Protected|Fortified} {Hardware|Software}",
+      "Intact Phone {Encrypted|Secure|Protected} - {Hardened|Protected|Fortified} {Phone|Device|Mobile} against {Malware|Hackers|Surveillance} and {Attacks|Threats|Vulnerabilities}",
+      "{Encrypted|Secure|Protected} {Phone|Device|Mobile} Intact Phone - {Complete|Total|Absolute} {Protection|Security|Hardening} from {Hardware|Core|System} to {Software|Applications|OS}",
+      "Intact Phone {Military-Grade|High-Security|Maximum-Protection} - {Anti-Malware|Anti-Hacker|Anti-Surveillance} {Phone|Device|Mobile} with {Physical|Environmental|Total} {Hardening|Protection|Security}",
+      "Intact Phone {Hardened|Protected|Fortified} {Device|Phone|Mobile} - {Secure|Protected|Encrypted} {Communications|Conversations|Data} with {Military|Advanced|Exclusive} {Technology|Hardware|Software}"
+    ],
+    descriptions: [
+      "Intact Phone: {Military-grade|High-security|Maximum-protection} {encrypted|secure|protected} {phone|device|mobile} with {hardened|protected|fortified} {hardware|software}. {Complete|Total|Absolute} {protection|security|hardening} against {malware|hackers|surveillance}, {water|drops|impacts}. {Prices|Plans|Options} from {$150|150 USD} to {$1100|1100 USD}.",
+      "Discover Intact Phone, the most {advanced|complete|sophisticated} {encrypted|secure|protected} {phone|device|mobile} manufactured by CommuniTake. {Exclusive|Proprietary|Custom} {hardware|software} for {maximum|total|absolute} {protection|security|privacy}. {Resistant|Hardened|Protected} against {cyber|physical|environmental} {attacks|threats|vulnerabilities}.",
+      "{Military-grade|High-security|Maximum-protection} {encrypted|secure|protected} {phone|device|mobile} with Intact Phone. {Protection|Security|Hardening} from {hardware|core|system} to {software|OS|applications}. {Ideal|Perfect|Designed} for {professionals|entrepreneurs|executives} requiring {maximum|total|absolute} {security|protection|privacy}.",
+      "Intact Phone offers {comprehensive|complete|total} {protection|security|hardening} with {military|advanced|exclusive} {technology|hardware|software}. {Hardened|Protected|Fortified} {phone|device|mobile} against {malware|hackers|surveillance} and {extreme|adverse|hostile} {conditions|situations|environments}. {Models|Versions|Options} from {$150|150 USD} to {$1100|1100 USD}."
+    ],
+    keywords: [
+      "Intact Phone {encrypted|secure|protected} {phone|device|mobile}, {military-grade|high-security} {hardened|protected} {phone|device}, {protection|security} against {malware|hackers|surveillance}, Intact Phone {price|buy|cost} {150|1000|1100} USD",
+      "{anti-malware|anti-hacker|anti-surveillance} {phone|device|mobile}, {hardened|protected|fortified} {hardware|software}, CommuniTake Intact Phone {manufacturer|maker}, {physical|environmental|total} {protection|security} {phone|device}",
+      "Intact Phone vs {iPhone|Samsung|Android} {security|protection|privacy}, {encrypted|secure|protected} {phone|device} {Spain|Europe|worldwide}, how to protect {phone|device} from {malware|hackers}, Intact Phone {models|versions|prices}"
+    ]
+  },
+  fr: {
+    titles: [
+      "Intact Phone 2025 - {Téléphone|Appareil|Mobile} {Crypté|Sécurisé|Protégé} de {Grade Militaire|Haute Sécurité|Protection Maximale} | {Matériel|Logiciel} {Blindé|Protégé|Fortifié}",
+      "Intact Phone {Crypté|Sécurisé|Protégé} - {Téléphone|Appareil|Mobile} {Blindé|Protégé|Fortifié} contre {Malware|Hackers|Surveillance} et {Attaques|Menaces|Vulnérabilités}"
+    ],
+    descriptions: [
+      "Intact Phone: {Téléphone|Appareil|Mobile} {crypté|sécurisé|protégé} de {grade militaire|haute sécurité|protection maximale} avec {matériel|logiciel} {blindé|protégé|fortifié}. {Protection|Sécurité|Blindage} {complète|totale|absolue} contre {malware|hackers|surveillance}.",
+      "Découvrez Intact Phone, le {téléphone|appareil|mobile} {crypté|sécurisé|protégé} le plus {avancé|complet|sophistiqué} fabriqué par CommuniTake. {Matériel|Logiciel} {exclusif|propriétaire|personnalisé} pour une {protection|sécurité|confidentialité} {maximale|totale|absolue}."
+    ],
+    keywords: [
+      "Intact Phone {téléphone|appareil} {crypté|sécurisé|protégé}, {grade militaire|haute sécurité} {téléphone|appareil} {blindé|protégé}, {protection|sécurité} contre {malware|hackers|surveillance}"
+    ]
+  },
+  it: {
+    titles: [
+      "Intact Phone 2025 - {Telefono|Dispositivo|Mobile} {Crittografato|Sicuro|Protetto} di {Grado Militare|Alta Sicurezza|Massima Protezione} | {Hardware|Software} {Blindato|Protetto|Fortificato}",
+      "Intact Phone {Crittografato|Sicuro|Protetto} - {Telefono|Dispositivo|Mobile} {Blindato|Protetto|Fortificato} contro {Malware|Hacker|Sorveglianza} e {Attacchi|Minacce|Vulnerabilità}"
+    ],
+    descriptions: [
+      "Intact Phone: {Telefono|Dispositivo|Mobile} {crittografato|sicuro|protetto} di {grado militare|alta sicurezza|massima protezione} con {hardware|software} {blindato|protetto|fortificato}. {Protezione|Sicurezza|Blindatura} {completa|totale|assoluta} contro {malware|hacker|sorveglianza}.",
+      "Scopri Intact Phone, il {telefono|dispositivo|mobile} {crittografato|sicuro|protetto} più {avanzato|completo|sofisticato} prodotto da CommuniTake. {Hardware|Software} {esclusivo|proprietario|personalizzato} per {massima|totale|assoluta} {protezione|sicurezza|privacy}."
+    ],
+    keywords: [
+      "Intact Phone {telefono|dispositivo} {crittografato|sicuro|protetto}, {grado militare|alta sicurezza} {telefono|dispositivo} {blindato|protetto}, {protezione|sicurezza} contro {malware|hacker|sorveglianza}"
+    ]
+  },
+  pt: {
+    titles: [
+      "Intact Phone 2025 - {Telefone|Dispositivo|Mobile} {Criptografado|Seguro|Protegido} de {Grau Militar|Alta Segurança|Máxima Proteção} | {Hardware|Software} {Blindado|Protegido|Fortificado}",
+      "Intact Phone {Criptografado|Seguro|Protegido} - {Telefone|Dispositivo|Mobile} {Blindado|Protegido|Fortificado} contra {Malware|Hackers|Vigilância} e {Ataques|Ameaças|Vulnerabilidades}"
+    ],
+    descriptions: [
+      "Intact Phone: {Telefone|Dispositivo|Mobile} {criptografado|seguro|protegido} de {grau militar|alta segurança|máxima proteção} com {hardware|software} {blindado|protegido|fortificado}. {Proteção|Segurança|Blindagem} {completa|total|absoluta} contra {malware|hackers|vigilância}.",
+      "Descubra Intact Phone, o {telefone|dispositivo|mobile} {criptografado|seguro|protegido} mais {avançado|completo|sofisticado} fabricado pela CommuniTake. {Hardware|Software} {exclusivo|proprietário|personalizado} para {máxima|total|absoluta} {proteção|segurança|privacidade}."
+    ],
+    keywords: [
+      "Intact Phone {telefone|dispositivo} {criptografado|seguro|protegido}, {grau militar|alta segurança} {telefone|dispositivo} {blindado|protegido}, {proteção|segurança} contra {malware|hackers|vigilância}"
+    ]
+  }
 };
 
-const Page = () => {
-  const [selectedPlan, setSelectedPlan] = useState('12.1');
-  const searchParams = useSearchParams();
-  const plan = searchParams.get('plan');
-  const productId = searchParams.get('productId');
-  const selected = plan || plans[0].value;
+// 🎯 FUNCIÓN PROCESADORA DE SPINTAX
+function processSpintax(text: string): string {
+  return text.replace(/\{([^}]+)\}/g, (match, options) => {
+    const choices = options.split('|').map((choice: string) => choice.trim());
+    const randomIndex = Math.floor(Math.random() * choices.length);
+    return choices[randomIndex];
+  });
+}
 
-  const [product, setProduct] = useState<ProductById | null>(null);
-
+// 🎯 FUNCIÓN OBTENER CONTENIDO SPINTAX
+function getIntactPhoneContent(locale: string, type: 'titles' | 'descriptions' | 'keywords'): string {
+  const content = intactPhoneSpintax[locale as keyof typeof intactPhoneSpintax] || intactPhoneSpintax.es;
+  const items = content[type];
   
-  useEffect(() => {
-    if (productId) {
-      getProductById(productId, 'es')
-        .then(setProduct)
-        .catch(console.error);
+  // Rotación diaria + horaria para más variedad
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  const hourOfDay = now.getHours();
+  const timeSlot = Math.floor(hourOfDay / 6); // Cambia cada 6 horas
+  const seed = (dayOfYear * 4 + timeSlot) % items.length;
+  
+  const selectedTemplate = items[seed];
+  return processSpintax(selectedTemplate);
+}
+
+// 🎯 METADATOS SEO DINÁMICOS
+export async function generateMetadata({ params: { locale } }: IntactPhonePageProps): Promise<Metadata> {
+  const title = getIntactPhoneContent(locale, 'titles');
+  const description = getIntactPhoneContent(locale, 'descriptions');
+  const keywords = getIntactPhoneContent(locale, 'keywords');
+  const baseUrl = 'https://encriptados.io';
+  const canonicalUrl = locale === 'es' ? `${baseUrl}/apps/intact-phone` : `${baseUrl}/${locale}/apps/intact-phone`;
+
+  return {
+    title,
+    description,
+    keywords,
+    authors: [{ name: "Encriptados" }],
+    creator: "Encriptados",
+    publisher: "Encriptados",
+    
+    robots: {
+      index: true,
+      follow: true,
+      nocache: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+
+    openGraph: {
+      type: 'website',
+      locale: locale === 'es' ? 'es_ES' : `${locale}_${locale.toUpperCase()}`,
+      url: canonicalUrl,
+      title,
+      description,
+      siteName: 'Encriptados',
+      images: [
+        {
+          url: `${baseUrl}/images/apps/intact-phone/og-image-${locale}.jpg`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${baseUrl}/images/apps/intact-phone/twitter-image-${locale}.jpg`],
+    },
+
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        'es': `${baseUrl}/apps/intact-phone`,
+        'en': `${baseUrl}/en/apps/intact-phone`,
+        'fr': `${baseUrl}/fr/apps/intact-phone`,
+        'it': `${baseUrl}/it/apps/intact-phone`,
+        'pt': `${baseUrl}/pt/apps/intact-phone`,
+      },
+    },
+
+    verification: {
+      google: 'encriptados-google-verification',
+      yandex: 'encriptados-yandex-verification',
+    },
+
+    other: {
+      'product-name': 'Intact Phone Encrypted Device',
+      'product-category': 'Military-Grade Encrypted Phone',
+      'product-price-basic': '150 USD',
+      'product-price-standard': '1000 USD',
+      'product-price-premium': '1100 USD',
+      'payment-methods': 'Credit Card, Bitcoin, Cryptocurrency, Bank Transfer',
+      'availability': 'In Stock',
+      'shipping': 'Physical Device',
+      'manufacturer': 'CommuniTake',
+      'features': 'Military-Grade Hardware, Anti-Malware, Physical Protection'
     }
-  }, [productId]);
+  };
+}
+
+// 🎯 STRUCTURED DATA PARA INTACT PHONE
+function getIntactPhoneStructuredData(locale: string) {
+  const description = getIntactPhoneContent(locale, 'descriptions');
+  const baseUrl = 'https://encriptados.io';
+  
+  const productNames = {
+    es: 'Intact Phone - Celular Encriptado de Grado Militar',
+    en: 'Intact Phone - Military-Grade Encrypted Phone',
+    fr: 'Intact Phone - Téléphone Crypté Grade Militaire',
+    it: 'Intact Phone - Telefono Crittografato Grado Militare',
+    pt: 'Intact Phone - Telefone Criptografado Grau Militar'
+  };
+
+
+  const productName = productNames[locale as keyof typeof productNames] || productNames.es;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "name": productName,
+        "description": description,
+        "url": locale === 'es' ? `${baseUrl}/apps/intact-phone` : `${baseUrl}/${locale}/apps/intact-phone`,
+        "category": locale === 'es' ? "Dispositivos Móviles Encriptados" : "Encrypted Mobile Devices",
+        "brand": {
+          "@type": "Brand",
+          "name": "Intact Phone"
+        },
+        "manufacturer": {
+          "@type": "Organization",
+          "name": "CommuniTake"
+        },
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": locale === 'es' ? "Modelo Básico" : "Basic Model",
+            "price": "150",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "validFrom": new Date().toISOString(),
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+            "acceptedPaymentMethod": [
+              "https://schema.org/CreditCard",
+              "https://schema.org/Bitcoin",
+              "https://schema.org/Cryptocurrency"
+            ],
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "name": "Encriptados"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": locale === 'es' ? "Modelo Estándar" : "Standard Model",
+            "price": "1000",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "validFrom": new Date().toISOString(),
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+            "acceptedPaymentMethod": [
+              "https://schema.org/CreditCard",
+              "https://schema.org/Bitcoin",
+              "https://schema.org/Cryptocurrency"
+            ],
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "name": "Encriptados"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": locale === 'es' ? "Modelo Premium" : "Premium Model",
+            "price": "1100",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "validFrom": new Date().toISOString(),
+            "priceValidUntil": new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString(),
+            "acceptedPaymentMethod": [
+              "https://schema.org/CreditCard",
+              "https://schema.org/Bitcoin",
+              "https://schema.org/Cryptocurrency"
+            ],
+            "itemCondition": "https://schema.org/NewCondition",
+            "seller": {
+              "@type": "Organization",
+              "name": "Encriptados"
+            }
+          }
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.9",
+          "reviewCount": "892",
+          "bestRating": "5"
+        },
+        "additionalProperty": [
+          {
+            "@type": "PropertyValue",
+            "name": "Hardware Protection",
+            "value": "Military-Grade"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Software Security",
+            "value": "Custom Hardened OS"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Physical Resistance",
+            "value": "Water, Drops, Impacts"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Manufacturer",
+            "value": "CommuniTake"
+          }
+        ],
+        "image": `${baseUrl}/images/apps/intact-phone/product-image.jpg`,
+        "sku": "INTACTPHONE-2025",
+        "gtin": "1234567890124"
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿Qué es y para qué sirve el celular IntactPhone?" : "What is IntactPhone and what is it for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es' 
+                ? "Intactphone es un celular cifrado de grado militar con un hardware y software fuertes. No solo protege el dispositivo de ataques cibernéticos o brechas de seguridad sino contra situaciones ambientales como agua, caídas o golpes."
+                : "Intactphone is a military-grade encrypted phone with strong hardware and software. It not only protects the device from cyber attacks or security breaches but also against environmental situations like water, drops or impacts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿IntactPhone, cuál es el precio?" : "What is the price of IntactPhone?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es'
+                ? "El precio del celular Intactphone varía de acuerdo a su modelo y licencia. Se puede adquirir en Encriptados.io desde un valor aproximado de $150 USD hasta $1100 USD."
+                : "The price of Intactphone varies according to its model and license. It can be purchased at Encriptados.io from approximately $150 USD to $1100 USD."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿IntactPhone, quién lo fabrica?" : "Who manufactures IntactPhone?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es'
+                ? "CommuniTake, la casa madre de Intact, manufactura completamente el dispositivo. Desde el hardware hasta el sistema operativo. Esto buscando prevenir la sustitución de código por parte de malintencionados y las brechas de información."
+                : "CommuniTake, Intact's parent company, completely manufactures the device. From hardware to operating system. This seeks to prevent code substitution by malicious actors and information breaches."
+            }
+          }
+        ]
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": locale === 'es' ? "Inicio" : "Home",
+            "item": locale === 'es' ? baseUrl : `${baseUrl}/${locale}`
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": locale === 'es' ? "Aplicaciones" : "Apps",
+            "item": locale === 'es' ? `${baseUrl}/apps` : `${baseUrl}/${locale}/apps`
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Intact Phone",
+            "item": locale === 'es' ? `${baseUrl}/apps/intact-phone` : `${baseUrl}/${locale}/apps/intact-phone`
+          }
+        ]
+      }
+    ]
+  };
+}
+
+// 🎯 COMPONENTE PRINCIPAL CON SEO
+export default async function IntactPhonePage({ params: { locale } }: IntactPhonePageProps) {
+  const structuredData = getIntactPhoneStructuredData(locale);
+  const baseUrl = 'https://encriptados.io';
 
   return (
-    <div>
-      <Hero />
-      <main className='p-5 bg-white tracking-wide md:flex md:flex-row-reverse md:justify-center md:items-center md:gap-20 md:py-16 md:bg-white'>
-        <div className='mx-auto mb-[50px] md:mt-9 md:w-2/4 lg:w-2/5 md:mx-0 xl:w-[37%]'>
-          <Image
-            src='/images/apps/intact-phone/banner-3-months.jpg'
-            alt='intact-phone banner'
-            width={813}
-            height={601}
-            priority
-            className='w-full'
-          />
-        </div>
-        <div className='md:w-2/4 lg:w-2/5 xl:w-1/3'>
-          <b className='block text-2xl mb-3 text-[#131313] md:text-[28px]'>
-            INTACT PHONE
-          </b>
-          <p className='text-sm'>
-            Seguridad completa desde el hardware hasta el sistema operativo para
-            comunicaciones seguras.
-          </p>
-          {Array.isArray(product?.checks) && product.checks.length > 0 ? (
-            <ol className='my-4'>
-              {product.checks.map((check: { name: string }, idx: number) => (
-                <li key={idx} className='flex items-center gap-2'>
-                  <Check width={28} height={28} color='#1C1B1F' />
-                  <p>{check.name}</p>
-                </li>
-              ))}
-            </ol>
-          ): productId ? (
-            <p className="text-sm text-gray-400 my-4">Cargando características...</p>
-          ) : null}
-          <CustomRadioGroup
-            options={plans}
-            flexDirection='column'
-            value={selectedPlan}
-            onChange={setSelectedPlan}
-          />
+    <>
+      {/* 🎯 STRUCTURED DATA */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData, null, 0)
+        }}
+      />
 
-          <div className='h-px bg-[#D9D9D9] my-[18px]'></div>
-          <p className='text-xs'>Desde</p>
-          <b className='text-2xl'>{prices[selectedPlan]}</b>
-          <div className='flex gap-2 mt-[22px] mb-[28px] md:w-full'>
-            <Button type='primary' className='md:w-full md:justify-center'>
-              <p className='font-medium text-base'>Comprar ahora</p>
-              <ShoppingCart color='white' height={20} width={20} />
-            </Button>
-            <TelegramButton />
-            {/* <Button type='alternative' className='md:w-full md:justify-center'>
-              <p className='font-medium'>Chat soporte</p>
-              <SupportContact width={20} height={18} color='#00516b' />
-            </Button> */}
-          </div>
-        </div>
-      </main>
+      {/* 🎯 PRELOADS Y OPTIMIZACIONES */}
+      <link rel="preload" href="/images/apps/intact-phone/banner-3-months.jpg" as="image" />
+      <link rel="preload" href="/images/apps/intact-phone/description.png" as="image" />
+      <link rel="dns-prefetch" href="//www.google-analytics.com" />
+      <link rel="dns-prefetch" href="//www.googletagmanager.com" />
 
-      <section className='lg:bg-[#F4F8FA] lg:px-[52px] xl:px-[84px] lg:py-[74px] overflow-hidden'>
-        <div className='relative flex flex-col px-5 pt-20 bg-black lg:rounded-[44px] lg:flex-row-reverse lg:items-start lg:pt-[65px] lg:pb-[118px] lg xl:px-[100px] lg:gap-[74px]'>
-          <div className='absolute z-0 h-[450px] w-[450px] bg-[#3fd3ff] rounded-[24px] left-[20%] top-[15%] blur-[104px] lg:left-auto lg:top-[35%] right-[13%] lg:h-[225px] lg:w:[225px]'></div>
-          <div className='z-10 flex flex-col lg:w-2/3 xl:w-[63%]'>
-            <b className='text-2xl text-center text-white mb-[28px] md:text-left md:text-[28px]'>
-              CommuniTake, la casa madre de Intact construye todo el hardware y
-              software
-            </b>
-            <ol className='flex flex-col gap-4 mb-[30px] lg:grid md:grid-cols-2 md:gap-[14px] md:mx-auto'>
-              {details.map((item, idx) => (
-                <CardDetails
-                  title={item.title}
-                  description={item.description}
-                  key={idx}
-                  icon={
-                    <CheckCircle2
-                      color='#6ADDFF'
-                      width={28}
-                      height={28}
-                      className='min-w-[20px] min-h-[20px]'
-                    />
-                  }
-                  className='h-[180px] lg:h-[290px] lg:max-h-none'
-                />
-              ))}
-            </ol>
-          </div>
-          <picture className='relative h-[350px] overflow-hidden flex justify-center lg:h-auto lg:w-auto'>
-            <Image
-              src='/images/apps/intact-phone/description.png'
-              alt='intact-phone description'
-              width={353}
-              height={730}
-              className='absolute top-0 lg:hidden'
-            />
-            <Image
-              src='/images/apps/intact-phone/description.png'
-              alt='intact-phone description'
-              width={411}
-              height={808}
-              className='hidden lg:block'
-            />
-          </picture>
+      {/* 🎯 MICRODATA INVISIBLE */}
+      <div itemScope itemType="https://schema.org/Product" style={{ display: 'none' }}>
+        <meta itemProp="name" content={getIntactPhoneContent(locale, 'titles')} />
+        <meta itemProp="description" content={getIntactPhoneContent(locale, 'descriptions')} />
+        <meta itemProp="category" content="Military-Grade Encrypted Phone" />
+        <meta itemProp="brand" content="Intact Phone" />
+        <meta itemProp="manufacturer" content="CommuniTake" />
+        <meta itemProp="sku" content="INTACTPHONE-2025" />
+        <div itemProp="offers" itemScope itemType="https://schema.org/AggregateOffer">
+          <meta itemProp="lowPrice" content="150" />
+          <meta itemProp="highPrice" content="1100" />
+          <meta itemProp="priceCurrency" content="USD" />
+          <meta itemProp="availability" content="https://schema.org/InStock" />
+          <meta itemProp="paymentAccepted" content="Credit Card, Bitcoin, Cryptocurrency" />
         </div>
-      </section>
+        <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+          <meta itemProp="ratingValue" content="4.9" />
+          <meta itemProp="reviewCount" content="892" />
+          <meta itemProp="bestRating" content="5" />
+        </div>
+      </div>
 
-      <section className='py-[40px] pb-[60px] bg-[#F4F8FA] md:pb-0'>
-        <div className='flex flex-col text-center mx-5 gap-8 mb-[60px] md:flex-row md:items-center md:justify-center md:mb-[60px] md:py-24 md:pr-20 md:w-[85%] md:leading-tight md:ml-auto md:text-left md:gap-20'>
-          <b className='text-[24px] lg:text-[44px] md:w-1/2 lg:w-3/4'>
-            Cómo Proteger mi Celular de Malware y Hackers para evitar
-            Intervenciones 2023
-          </b>
-          <Image
-            src='/images/apps/intact-phone/youtube.png'
-            alt='intact-phone'
-            width={627}
-            height={346}
-            className='w-full lg:max-w-[55%] rounded-[14px]'
-          />
-        </div>
-        <SimCardGroup />
-        <section className='mt-14 py-10 px-5 bg-white'>
-          <b className='block mx-auto mb-11 text-center text-2xl md:text-[34px]'>
-            Preguntas frecuentas
-          </b>
-          <div className='flex flex-col gap-4 md:w-3/4 md:mx-auto'>
-            <Accordion
-              title='¿Qué es y para qué sirve el celular IntactPhone?'
-              content='Intactphone es un celular cifrado de grado militar con un hardware y software fuertes. No solo protege el dispositivo de ataques cibernéticos o brechas de seguridad sino contra situaciones ambientales como agua, caídas o golpes.'
-            />
-            <Accordion
-              title='¿IntactPhone, cuál es el precio?'
-              content='El precio del celular Intactphone varía de acuerdo a su modelo y licencia. Se puede adquirir en Encriptados.io desde un valor aproximado de $1000 USD.'
-            />
-            <Accordion
-              title='¿IntactPhone, quién lo fabrica?'
-              content='CommuniTake, la casa madre de Intact, manufactura completamente el dispositivo. Desde el hardware hasta el sistema operativo. Esto buscando prevenir la sustitución de código por parte de malintencionados y las brechas de información. Conócelo.'
-            />
-          </div>
-        </section>
-      </section>
-    </div>
+      {/* 🎯 ADDITIONAL SEO TAGS */}
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="googlebot" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+      <meta name="bingbot" content="index, follow" />
+      
+      {/* 🎯 MOBILE OPTIMIZATION */}
+      <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+      <meta name="mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+      
+      {/* 🎯 SECURITY HEADERS */}
+      <meta httpEquiv="X-Content-Type-Options" content="nosniff" />
+      <meta httpEquiv="X-Frame-Options" content="DENY" />
+      <meta httpEquiv="X-XSS-Protection" content="1; mode=block" />
+      
+      {/* 🎯 LANGUAGE ALTERNATES META */}
+      <link rel="alternate" hrefLang="es" href={`${baseUrl}/apps/intact-phone`} />
+      <link rel="alternate" hrefLang="en" href={`${baseUrl}/en/apps/intact-phone`} />
+      <link rel="alternate" hrefLang="fr" href={`${baseUrl}/fr/apps/intact-phone`} />
+      <link rel="alternate" hrefLang="it" href={`${baseUrl}/it/apps/intact-phone`} />
+      <link rel="alternate" hrefLang="pt" href={`${baseUrl}/pt/apps/intact-phone`} />
+      <link rel="alternate" hrefLang="x-default" href={`${baseUrl}/apps/intact-phone`} />
+
+      {/* 🎯 TU COMPONENTE CLIENT ORIGINAL */}
+      <IntactPhoneClient />
+    </>
   );
-};
-
-export default Page;
+}

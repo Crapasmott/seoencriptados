@@ -9,7 +9,6 @@ import PaymentOption from "./PaymentOption";
 import DividerSection from "./DividerSection";
 import EditableDividerSection from "./EditableDividerSection";
 
-import PayWithCreditCard from "./PaymentMethodsView/PayWithCreditCard";
 import PayWithCrypto from "./PaymentMethodsView/PayWithCrypto";
 
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +21,6 @@ import {
 } from "@/shared/hooks/paymentOptions";
 import { paymentValidationSchema } from "@/shared/validations/paymentValidation";
 import { initialFormValues } from "@/shared/constants/initialFormValues";
-import { StripeProvider } from "@/shared/components/StripeProvider";
 
 const ModalPaymentView: React.FC = () => {
   const { closeModal, params } = useModalPayment();
@@ -34,10 +32,8 @@ const ModalPaymentView: React.FC = () => {
   const {
     data: product,
     isLoading,
-    error: productError,
   } = useQuery<Product, Error, Product>({
     queryKey: ["productById", productid],
-    // aquí va tu función de fetch
     queryFn: () => getProductById(productid!),
     enabled: !!productid,
   });
@@ -91,7 +87,6 @@ const ModalPaymentView: React.FC = () => {
             </div>
 
             <div className="flex flex-col md:flex-row gap-6 items-stretch">
-              {/* Imagen del producto */}
               <div className="flex-1 rounded-xl flex flex-col justify-start">
                 <div className="w-full h-48 relative rounded-lg overflow-hidden">
                   <Image
@@ -100,13 +95,12 @@ const ModalPaymentView: React.FC = () => {
                     fill
                     className="object-cover"
                   />
-                  </div>
-                  <h3 className="mt-4 font-semibold text-lg text-blue-900 text-center">
-                    {product?.name}
-                  </h3>
+                </div>
+                <h3 className="mt-4 font-semibold text-lg text-blue-900 text-center">
+                  {product?.name}
+                </h3>
               </div>
 
-              {/* Formulario principal */}
               <div className="flex-1">
                 <div className="flex flex-col gap-1">
                   <DividerSection
@@ -158,32 +152,20 @@ const ModalPaymentView: React.FC = () => {
                     value={`${totalPrice} USD`}
                   />
 
-                  {/* Componente de pago */}
-                  {activePaymentOption === PAYMENTS_METHODS.CREDIT_CARD && (
-                    <StripeProvider>
-                      <PayWithCreditCard
-                        productId={productid!}
+                  {activePaymentOption === PAYMENTS_METHODS.CRYPTO && product && (
+                    <div className="hidden">
+                      <PayWithCrypto
+                        product={product}
                         closeModal={goBack}
                         languageCode={languageCode ?? "es"}
                         email={values.email}
-                        product={product!}
                       />
-                    </StripeProvider>
+                    </div>
                   )}
-
-                 {activePaymentOption === PAYMENTS_METHODS.CRYPTO && product && (
-                  <div className="hidden">
-                    <PayWithCrypto
-                      product={product}
-                      closeModal={goBack}
-                      languageCode={languageCode ?? "es"}
-                      email={values.email}
-                    />
-                  </div>
-                )}
                 </div>
               </div>
             </div>
+            
             {activePaymentOption === null && (
               <div className="w-full rounded-xl p-4 mt-1">
                 <h3 className="text-sm font-medium text-gray-700 mb-3">
@@ -246,6 +228,7 @@ const ModalPaymentView: React.FC = () => {
                 )}
               </div>
             )}
+            
             {activePaymentOption === null && (
               <div className="pt-4">
                 <h3 className="text-sm font-semibold text-gray-600 mb-2">
@@ -258,67 +241,66 @@ const ModalPaymentView: React.FC = () => {
                       option={option}
                       activeOption={activePaymentOption}
                       setActiveOption={(value) => {
-                      if (!emailIsValid) {
-                        setFieldTouched("email", true);
-                        setFieldTouched("termsAccepted", true);
-                        return;
-                      }
+                        if (!emailIsValid) {
+                          setFieldTouched("email", true);
+                          setFieldTouched("termsAccepted", true);
+                          return;
+                        }
 
-                      if (value === PAYMENTS_METHODS.CRYPTO) {
-                        const url = process.env.NEXT_PUBLIC_API_CRYPTO_MUS || `${window.location.origin}/api/cripto/cryptomus-process`;
+                        if (value === PAYMENTS_METHODS.CRYPTO) {
+                          const url = process.env.NEXT_PUBLIC_API_CRYPTO_MUS || `${window.location.origin}/api/cripto/cryptomus-process`;
 
-                        const payload = {
-                          sim_number: "",
-                          email: values.email,
-                          telegramid: values.telegramId || "",
-                          name: product?.name || "",
-                          product_type: product?.type_product || "app",
-                          esim_select: "No",
-                          lang: languageCode ?? "es",
-                          type: "5",
-                          cripto: "",
-                          description: `${product?.name}\n${product?.licensetime || "12 meses de servicio"}`,
-                          amount: Number(product?.price || 0) * 100,
-                          image: product?.images?.[0]?.src || "",
-                          quantity: 1,
-                          planinfo: "",
-                          variant1: "",
-                          variant2: "",
-                          variant3: "",
-                          address: "",
-                          city: "",
-                          country: "",
-                          postal: "",
-                          phone: "",
-                          titular: "",
-                          postal_code: "",
-                        };
+                          const payload = {
+                            sim_number: "",
+                            email: values.email,
+                            telegramid: values.telegramId || "",
+                            name: product?.name || "",
+                            product_type: product?.type_product || "app",
+                            esim_select: "No",
+                            lang: languageCode ?? "es",
+                            type: "5",
+                            cripto: "",
+                            description: `${product?.name}\n${product?.licensetime || "12 meses de servicio"}`,
+                            amount: Number(product?.price || 0) * 100,
+                            image: product?.images?.[0]?.src || "",
+                            quantity: 1,
+                            planinfo: "",
+                            variant1: "",
+                            variant2: "",
+                            variant3: "",
+                            address: "",
+                            city: "",
+                            country: "",
+                            postal: "",
+                            phone: "",
+                            titular: "",
+                            postal_code: "",
+                          };
 
-                        fetch(url, {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify(payload),
-                        })
-                          .then((res) => res.json())
-                          .then((json) => {
-                            if (json?.status && json?.url) {
-                              window.location.href = json.url;
-                            } else {
-                              throw new Error(json.message || "Error al generar pago cripto");
-                            }
+                          fetch(url, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify(payload),
                           })
-                          .catch((err) => {
-                            console.error("❌ Error redirigiendo a Cryptomus", err);
-                            alert("Hubo un error al procesar el pago con criptomonedas.");
-                            closeModal();
-                          });
+                            .then((res) => res.json())
+                            .then((json) => {
+                              if (json?.status && json?.url) {
+                                window.location.href = json.url;
+                              } else {
+                                throw new Error(json.message || "Error al generar pago cripto");
+                              }
+                            })
+                            .catch((err) => {
+                              console.error("❌ Error redirigiendo a Cryptomus", err);
+                              alert("Hubo un error al procesar el pago con criptomonedas.");
+                              closeModal();
+                            });
 
-                        return; 
-                      }
+                          return; 
+                        }
 
-                      setPaymentActiveOption(value);
-                    }}
-
+                        setPaymentActiveOption(value);
+                      }}
                       disabled={!emailIsValid}
                     />
                   ))}

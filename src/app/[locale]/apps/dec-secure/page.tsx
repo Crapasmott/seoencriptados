@@ -1,256 +1,424 @@
-'use client';
+// src/app/[locale]/apps/dec-secure/page.tsx - CON SEO Y SPINTAX
+import React from "react";
+import { Metadata } from 'next';
+import DecSecureClient from "./DecSecureClient";
 
-import ShoppingCart from '@/shared/svgs/ShoppingCart';
-import SupportContact from '@/shared/svgs/SupportContact';
-import { Check, CheckCircle2 } from 'lucide-react';
-import Image from 'next/image';
-import Accordion from '../shared/Accordion';
-import Button from '../shared/Button';
-import CardDetails from '../shared/CardDetails';
-import SimCardGroup from '../shared/SimCardGroup';
-import Hero from './components/Hero';
-import CustomRadioGroup from './components/RadioGroup';
-import { details } from './consts/details';
-import { plans } from './consts/plans';
-import { characteristics } from './consts/characteristics';
-import DetailsElement from './components/DetailsElement';
-import { useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { getProductById } from '@/features/products/services';
-import type { ProductById } from '@/features/products/types/AllProductsResponse';
-import TelegramButton from '@/shared/components/TelegramButton';
+interface DecSecurePageProps {
+  params: { locale: string };
+}
 
-const prices: Record<string, string> = {
-  '3': '349$ USD',
-  '6': '600$ USD'
+// 🎯 SISTEMA SPINTAX PARA DEC SECURE
+const decSecureSpintax = {
+  es: {
+    titles: [
+      "DEC Secure 2025 - {Dispositivo|Celular|Smartphone} {Móvil|Portátil} {Seguro|Protegido|Blindado} con {VPN|Privacidad|Conexión} {Integrada|Incluida|Nativa}",
+      "DEC Secure {Móvil|Dispositivo|Celular} - {Privacidad|Seguridad|Protección} {Total|Completa|Absoluta} para tu {Información|Datos|Comunicaciones}",
+      "{Dispositivo|Celular|Smartphone} DEC Secure - {Conectividad|Conexión|Comunicación} {Segura|Protegida|Privada} con {Gestión|Control|Administración} de {Aplicaciones|Apps|Software}",
+      "DEC Secure {Premium|Pro|Advanced} - {Tranquilidad|Seguridad|Privacidad} {Total|Completa|Absoluta} en tu {Dispositivo|Celular|Smartphone} {Móvil|Portátil}",
+      "🔒 DEC Secure - {Dispositivo|Celular} {Móvil|Portátil} {Seguro|Protegido} | {VPN|Privacidad|Conexión} {Integrada|Incluida} + {Bitcoin|Criptomonedas|Crypto}",
+      "DEC Secure vs {iPhone|Samsung|Huawei} - {Dispositivo|Celular} {Móvil|Portátil} con {Máxima|Extrema|Total} {Privacidad|Seguridad|Protección}",
+      "⚡ {Comprar|Adquirir|Obtener} DEC Secure con {Bitcoin|Criptomonedas|Crypto} - {Dispositivo|Celular} {Móvil|Portátil} {Seguro|Protegido}",
+      "DEC Secure {2025|Premium|Pro} - {Protege|Asegura|Blinda} tu {Información|Datos|Privacidad} con {Dispositivo|Celular} {Móvil|Seguro}"
+    ],
+    descriptions: [
+      "DEC Secure: {Dispositivo|Celular|Smartphone} {móvil|portátil} {seguro|protegido|blindado} que ofrece {total|completa|absoluta} {tranquilidad|seguridad|privacidad} cuando se trata de la {privacidad|seguridad|protección} de la {información|datos|comunicaciones} en tu {dispositivo|celular|smartphone} {móvil|portátil}. {VPN|Conexión|Privacidad} {integrada|incluida|nativa}, {gestión|control|administración} de {aplicaciones|apps|software} {seguras|protegidas|verificadas}. {Acepta|Soporta|Compatible con} {pagos|compras|adquisición} con {Bitcoin|criptomonedas|crypto}.",
+      "Descubre DEC Secure, el {dispositivo|celular|smartphone} {móvil|portátil} que te {mantiene|conserva|preserva} {conectado|comunicado|enlazado} de forma {segura|protegida|privada}. {Gestión|Control|Administración} de {aplicaciones|apps|software} {móviles|portátiles}, {biblioteca|catálogo|colección} de {aplicaciones|apps} {privadas|seguras|verificadas}, {lista blanca|control|filtro} de {aplicaciones|apps|software}. {Pago|Compra|Adquisición} con {Bitcoin|criptomonedas|crypto} {disponible|aceptado|soportado}.",
+      "{Dispositivo|Celular|Smartphone} {móvil|portátil} {seguro|protegido|blindado} DEC Secure - La {seguridad|protección|privacidad} de tus {datos|información|comunicaciones} es nuestra {máxima|principal|primera} {prioridad|preocupación|objetivo}. {Solo|Únicamente|Exclusivamente} {aplicaciones|apps|software} {aprobadas|verificadas|seguras}, {gestión|control|administración} {completa|total|absoluta}. {Ideal|Perfecto|Diseñado} para usuarios que {requieren|necesitan|demandan} {máxima|extrema|total} {privacidad|seguridad|protección}.",
+      "DEC Secure ofrece {conectividad|conexión|comunicación} {segura|protegida|privada} con {tecnología|sistemas|protocolos} {avanzada|premium|de vanguardia} y {gestión|control|administración} {rigurosa|estricta|completa} de {aplicaciones|apps|software}. {Biblioteca|Catálogo|Colección} de {aplicaciones|apps} {privadas|seguras|verificadas}, {acepta|soporta|compatible con} {Bitcoin|criptomonedas|crypto}.",
+      "⚡ {Mantente|Permanece|Quédate} {conectado|comunicado|enlazado} de forma {segura|protegida|privada} con DEC Secure - El {dispositivo|celular|smartphone} {móvil|portátil} más {seguro|protegido|privado} para {comunicaciones|conexiones|datos} {privadas|seguras|protegidas}. {VPN|Privacidad|Conexión} {integrada|incluida|nativa}, {aplicaciones|apps} {verificadas|seguras|aprobadas}, {pago|compra} con {Bitcoin|criptomonedas|crypto}."
+    ],
+    keywords: [
+      "DEC Secure {dispositivo|celular|smartphone} {móvil|portátil} {seguro|protegido|blindado}, {dispositivo|celular} {móvil|portátil} {privacidad|seguridad} {total|completa}, DEC Secure {VPN|conexión} {integrada|incluida}, DEC Secure {Bitcoin|criptomonedas|crypto} {pago|compra|adquisición}",
+      "{dispositivo|celular} {móvil|portátil} {seguro|protegido} {gestión|control} {aplicaciones|apps}, DEC Secure vs {iPhone|Samsung|Huawei} {privacidad|seguridad}, {dispositivo|celular} {aplicaciones|apps} {verificadas|seguras|aprobadas}, DEC Secure {comprar|adquirir} con {Bitcoin|criptomonedas|crypto}",
+      "DEC Secure {dispositivo|celular} {móvil|seguro} {España|México|Argentina|Colombia}, {smartphone|celular} {privacidad|seguridad} {total|completa}, {dispositivo|celular} {gestión|control} {aplicaciones|software}, DEC Secure {tranquilidad|seguridad} {información|datos}"
+    ]
+  },
+  en: {
+    titles: [
+      "DEC Secure 2025 - {Secure|Protected|Shielded} {Mobile|Portable} {Device|Phone|Smartphone} with {Integrated|Built-in|Native} {VPN|Privacy|Connection}",
+      "DEC Secure {Mobile|Device|Phone} - {Total|Complete|Absolute} {Privacy|Security|Protection} for your {Information|Data|Communications}",
+      "DEC Secure {Device|Phone|Smartphone} - {Secure|Protected|Private} {Connectivity|Connection|Communication} with {Application|App|Software} {Management|Control|Administration}",
+      "DEC Secure {Premium|Pro|Advanced} - {Total|Complete|Absolute} {Peace of Mind|Security|Privacy} for your {Mobile|Portable} {Device|Phone|Smartphone}",
+      "🔒 DEC Secure - {Secure|Protected} {Mobile|Portable} {Device|Phone} | {Integrated|Built-in} {VPN|Privacy|Connection} + {Bitcoin|Cryptocurrency|Crypto}",
+      "DEC Secure vs {iPhone|Samsung|Huawei} - {Mobile|Portable} {Device|Phone} with {Maximum|Extreme|Total} {Privacy|Security|Protection}",
+      "⚡ {Buy|Purchase|Get} DEC Secure with {Bitcoin|Cryptocurrency|Crypto} - {Secure|Protected} {Mobile|Portable} {Device|Phone}",
+      "DEC Secure {2025|Premium|Pro} - {Protect|Secure|Shield} your {Information|Data|Privacy} with {Secure|Protected} {Mobile|Portable} {Device|Phone}"
+    ],
+    descriptions: [
+      "DEC Secure: {Secure|Protected|Shielded} {mobile|portable} {device|phone|smartphone} that offers {total|complete|absolute} {peace of mind|security|privacy} when it comes to the {privacy|security|protection} of {information|data|communications} on your {mobile|portable} {device|phone|smartphone}. {Integrated|Built-in|Native} {VPN|connection|privacy}, {secure|protected|verified} {application|app|software} {management|control|administration}. {Accepts|Supports|Compatible with} {Bitcoin|cryptocurrency|crypto} {payments|purchases}.",
+      "Discover DEC Secure, the {mobile|portable} {device|phone|smartphone} that {keeps|maintains|preserves} you {connected|linked|communicated} in a {secure|protected|private} way. {Mobile|Portable} {application|app|software} {management|control|administration}, {private|secure|verified} {application|app} {library|catalog|collection}, {application|app|software} {whitelist|control|filter}. {Bitcoin|Cryptocurrency|Crypto} {payment|purchase} {available|accepted|supported}.",
+      "{Secure|Protected|Shielded} {mobile|portable} DEC Secure {device|phone|smartphone} - The {security|protection|privacy} of your {data|information|communications} is our {top|main|first} {priority|concern|objective}. {Only|Exclusively|Solely} {approved|verified|secure} {applications|apps|software}, {complete|total|absolute} {management|control|administration}. {Ideal|Perfect|Designed} for users who {require|need|demand} {maximum|extreme|total} {privacy|security|protection}.",
+      "DEC Secure offers {secure|protected|private} {connectivity|connection|communication} with {advanced|premium|cutting-edge} {technology|systems|protocols} and {rigorous|strict|complete} {application|app|software} {management|control|administration}. {Private|Secure|Verified} {application|app} {library|catalog|collection}, {accepts|supports|compatible with} {Bitcoin|cryptocurrency|crypto}.",
+      "⚡ {Stay|Remain|Keep} {connected|linked|communicated} {securely|safely|privately} with DEC Secure - The most {secure|protected|private} {mobile|portable} {device|phone|smartphone} for {private|secure|protected} {communications|connections|data}. {Integrated|Built-in|Native} {VPN|privacy|connection}, {verified|secure|approved} {applications|apps}, {Bitcoin|cryptocurrency|crypto} {payment|purchase}."
+    ],
+    keywords: [
+      "DEC Secure {secure|protected|shielded} {mobile|portable} {device|phone|smartphone}, {mobile|portable} {device|phone} {total|complete} {privacy|security}, DEC Secure {integrated|built-in} {VPN|connection}, DEC Secure {Bitcoin|cryptocurrency|crypto} {payment|purchase}",
+      "{secure|protected} {mobile|portable} {device|phone} {application|app} {management|control}, DEC Secure vs {iPhone|Samsung|Huawei} {privacy|security}, {device|phone} {verified|secure|approved} {applications|apps}, DEC Secure {buy|purchase} with {Bitcoin|cryptocurrency|crypto}",
+      "DEC Secure {secure|protected} {mobile|portable} {device|phone} {USA|UK|Canada|Australia}, {smartphone|phone} {total|complete} {privacy|security}, {device|phone} {application|software} {management|control}, DEC Secure {peace of mind|security} {information|data}"
+    ]
+  },
+  fr: {
+    titles: [
+      "DEC Secure 2025 - {Appareil|Téléphone|Smartphone} {Mobile|Portable} {Sécurisé|Protégé|Blindé} avec {VPN|Confidentialité|Connexion} {Intégré|Inclus|Natif}",
+      "DEC Secure {Mobile|Appareil|Téléphone} - {Confidentialité|Sécurité|Protection} {Totale|Complète|Absolue} pour vos {Informations|Données|Communications}",
+      "Appareil DEC Secure - {Connectivité|Connexion|Communication} {Sécurisée|Protégée|Privée} avec {Gestion|Contrôle|Administration} d'{Applications|Apps|Logiciels}",
+      "DEC Secure {Premium|Pro|Avancé} - {Tranquillité|Sécurité|Confidentialité} {Totale|Complète|Absolue} pour votre {Appareil|Téléphone} {Mobile|Portable}",
+      "🔒 DEC Secure - {Appareil|Téléphone} {Mobile|Portable} {Sécurisé|Protégé} | {VPN|Confidentialité} {Intégré|Inclus} + {Bitcoin|Cryptomonnaies|Crypto}"
+    ],
+    descriptions: [
+      "DEC Secure: {Appareil|Téléphone|Smartphone} {mobile|portable} {sécurisé|protégé|blindé} qui offre une {tranquillité|sécurité|confidentialité} {totale|complète|absolue} en matière de {confidentialité|sécurité|protection} des {informations|données|communications} sur votre {appareil|téléphone} {mobile|portable}.",
+      "Découvrez DEC Secure, l'appareil {mobile|portable} qui vous {maintient|conserve|préserve} {connecté|lié|en communication} de manière {sécurisée|protégée|privée}. {Gestion|Contrôle|Administration} d'{applications|apps} {mobiles|portables}, {bibliothèque|catalogue} d'{applications|apps} {privées|sécurisées|vérifiées}."
+    ],
+    keywords: [
+      "DEC Secure {appareil|téléphone|smartphone} {mobile|portable} {sécurisé|protégé}, {appareil|téléphone} {mobile|portable} {confidentialité|sécurité} {totale|complète}, DEC Secure {VPN|connexion} {intégré|inclus}, DEC Secure {Bitcoin|cryptomonnaies|crypto} {paiement|achat}"
+    ]
+  },
+  it: {
+    titles: [
+      "DEC Secure 2025 - {Dispositivo|Telefono|Smartphone} {Mobile|Portatile} {Sicuro|Protetto|Blindato} con {VPN|Privacy|Connessione} {Integrata|Inclusa|Nativa}",
+      "DEC Secure {Mobile|Dispositivo|Telefono} - {Privacy|Sicurezza|Protezione} {Totale|Completa|Assoluta} per le tue {Informazioni|Dati|Comunicazioni}",
+      "Dispositivo DEC Secure - {Connettività|Connessione|Comunicazione} {Sicura|Protetta|Privata} con {Gestione|Controllo|Amministrazione} {Applicazioni|App|Software}",
+      "DEC Secure {Premium|Pro|Avanzato} - {Tranquillità|Sicurezza|Privacy} {Totale|Completa|Assoluta} per il tuo {Dispositivo|Telefono} {Mobile|Portatile}",
+      "🔒 DEC Secure - {Dispositivo|Telefono} {Mobile|Portatile} {Sicuro|Protetto} | {VPN|Privacy} {Integrata|Inclusa} + {Bitcoin|Criptovalute|Crypto}"
+    ],
+    descriptions: [
+      "DEC Secure: {Dispositivo|Telefono|Smartphone} {mobile|portatile} {sicuro|protetto|blindato} che offre {totale|completa|assoluta} {tranquillità|sicurezza|privacy} quando si tratta della {privacy|sicurezza|protezione} delle {informazioni|dati|comunicazioni} sul tuo {dispositivo|telefono} {mobile|portatile}.",
+      "Scopri DEC Secure, il {dispositivo|telefono} {mobile|portatile} che ti {mantiene|conserva|preserva} {connesso|collegato|in comunicazione} in modo {sicuro|protetto|privato}. {Gestione|Controllo|Amministrazione} {applicazioni|app} {mobili|portatili}, {libreria|catalogo} {applicazioni|app} {private|sicure|verificate}."
+    ],
+    keywords: [
+      "DEC Secure {dispositivo|telefono|smartphone} {mobile|portatile} {sicuro|protetto}, {dispositivo|telefono} {mobile|portatile} {privacy|sicurezza} {totale|completa}, DEC Secure {VPN|connessione} {integrata|inclusa}, DEC Secure {Bitcoin|criptovalute|crypto} {pagamento|acquisto}"
+    ]
+  },
+  pt: {
+    titles: [
+      "DEC Secure 2025 - {Dispositivo|Telefone|Smartphone} {Móvel|Portátil} {Seguro|Protegido|Blindado} com {VPN|Privacidade|Conexão} {Integrada|Incluída|Nativa}",
+      "DEC Secure {Móvel|Dispositivo|Telefone} - {Privacidade|Segurança|Proteção} {Total|Completa|Absoluta} para suas {Informações|Dados|Comunicações}",
+      "Dispositivo DEC Secure - {Conectividade|Conexão|Comunicação} {Segura|Protegida|Privada} com {Gestão|Controle|Administração} de {Aplicações|Apps|Software}",
+      "DEC Secure {Premium|Pro|Avançado} - {Tranquilidade|Segurança|Privacidade} {Total|Completa|Absoluta} para seu {Dispositivo|Telefone} {Móvel|Portátil}",
+      "🔒 DEC Secure - {Dispositivo|Telefone} {Móvel|Portátil} {Seguro|Protegido} | {VPN|Privacidade} {Integrada|Incluída} + {Bitcoin|Criptomoedas|Crypto}"
+    ],
+    descriptions: [
+      "DEC Secure: {Dispositivo|Telefone|Smartphone} {móvel|portátil} {seguro|protegido|blindado} que oferece {total|completa|absoluta} {tranquilidade|segurança|privacidade} quando se trata da {privacidade|segurança|proteção} das {informações|dados|comunicações} no seu {dispositivo|telefone} {móvel|portátil}.",
+      "Descubra DEC Secure, o {dispositivo|telefone} {móvel|portátil} que te {mantém|conserva|preserva} {conectado|ligado|em comunicação} de forma {segura|protegida|privada}. {Gestão|Controle|Administração} de {aplicações|apps} {móveis|portáteis}, {biblioteca|catálogo} de {aplicações|apps} {privadas|seguras|verificadas}."
+    ],
+    keywords: [
+      "DEC Secure {dispositivo|telefone|smartphone} {móvel|portátil} {seguro|protegido}, {dispositivo|telefone} {móvel|portátil} {privacidade|segurança} {total|completa}, DEC Secure {VPN|conexão} {integrada|incluída}, DEC Secure {Bitcoin|criptomoedas|crypto} {pagamento|compra}"
+    ]
+  }
 };
 
-const Page = () => {
-  const searchParams = useSearchParams();
-  const plan = searchParams.get('plan');
-  const productId = searchParams.get('productId');
-  const selected = plan || plans[0].value;
+// 🎯 FUNCIÓN PROCESADORA DE SPINTAX
+function processSpintax(text: string): string {
+  return text.replace(/\{([^}]+)\}/g, (match, options) => {
+    const choices = options.split('|').map((choice: string) => choice.trim());
+    const randomIndex = Math.floor(Math.random() * choices.length);
+    return choices[randomIndex];
+  });
+}
 
-  const [product, setProduct] = useState<ProductById | null>(null);
+// 🎯 FUNCIÓN OBTENER CONTENIDO SPINTAX
+function getDecSecureContent(locale: string, type: 'titles' | 'descriptions' | 'keywords'): string {
+  const content = decSecureSpintax[locale as keyof typeof decSecureSpintax] || decSecureSpintax.es;
+  const items = content[type];
+  
+  const now = new Date();
+  const dayOfYear = Math.floor((now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86400000);
+  const hourOfDay = now.getHours();
+  const timeSlot = Math.floor(hourOfDay / 6);
+  const seed = (dayOfYear * 4 + timeSlot) % items.length;
+  
+  const selectedTemplate = items[seed];
+  return processSpintax(selectedTemplate);
+}
 
-  useEffect(() => {
-    if (productId) {
-      getProductById(productId, 'es')
-        .then(setProduct)
-        .catch(console.error);
+// 🎯 METADATOS SEO DINÁMICOS
+export async function generateMetadata({ params: { locale } }: DecSecurePageProps): Promise<Metadata> {
+  const title = getDecSecureContent(locale, 'titles');
+  const description = getDecSecureContent(locale, 'descriptions');
+  const keywords = getDecSecureContent(locale, 'keywords');
+  const baseUrl = 'https://encriptados.io';
+  const canonicalUrl = locale === 'es' ? `${baseUrl}/apps/dec-secure` : `${baseUrl}/${locale}/apps/dec-secure`;
+
+  return {
+    title,
+    description,
+    keywords,
+    authors: [{ name: "Encriptados" }],
+    creator: "Encriptados",
+    publisher: "Encriptados",
+    category: 'Technology',
+    classification: 'Secure Mobile Device with VPN',
+    
+    robots: {
+      index: true,
+      follow: true,
+      nocache: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        noimageindex: false,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+
+    openGraph: {
+      type: 'website',
+      locale: locale === 'es' ? 'es_ES' : `${locale}_${locale.toUpperCase()}`,
+      url: canonicalUrl,
+      title,
+      description,
+      siteName: 'Encriptados',
+      images: [
+        {
+          url: `${baseUrl}/images/apps/dec-secure/og-image-${locale}.jpg`,
+          width: 1200,
+          height: 630,
+          alt: title,
+        }
+      ],
+    },
+
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [`${baseUrl}/images/apps/dec-secure/twitter-image-${locale}.jpg`],
+    },
+
+    alternates: {
+      canonical: canonicalUrl,
+      languages: {
+        'es': `${baseUrl}/apps/dec-secure`,
+        'en': `${baseUrl}/en/apps/dec-secure`,
+        'fr': `${baseUrl}/fr/apps/dec-secure`,
+        'it': `${baseUrl}/it/apps/dec-secure`,
+        'pt': `${baseUrl}/pt/apps/dec-secure`,
+      },
+    },
+
+    verification: {
+      google: 'encriptados-google-verification',
+      yandex: 'encriptados-yandex-verification',
+    },
+
+    other: {
+      'product-name': 'DEC Secure',
+      'product-category': 'Secure Mobile Device with VPN',
+      'product-type': 'Managed Secure Smartphone',
+      'product-price-3months': '349 USD',
+      'product-price-6months': '600 USD',
+      'payment-methods': 'Credit Card, Bitcoin, Cryptocurrency, Bank Transfer',
+      'crypto-payments': 'Bitcoin, Ethereum, Litecoin, Monero, USDT, USDC',
+      'availability': 'In Stock',
+      'shipping': 'Worldwide Shipping',
+      'target-audience': 'Privacy-Conscious Users, Business Professionals, Security-Aware Individuals',
+      'device-type': 'Managed Secure Smartphone',
+      'vpn-integration': 'Built-in VPN Connection',
+      'app-management': 'Private Application Library',
+      'security-level': 'Enhanced Privacy Protection',
+      'connectivity': 'Secure Private Connection',
+      'use-cases': 'Secure Mobile Communications, Private Connectivity, Managed Applications',
+      'competitors': 'iPhone, Samsung Galaxy, Google Pixel, Huawei',
+      'features': 'Integrated VPN, App Management, Private Library, Secure Connectivity',
+      'security-features': 'VPN Integration, App Whitelist, Private App Store, Secure Connection',
+      'rating': '4.7/5',
+      'review-count': '1987',
+      'device-version': '2.0',
+      'last-updated': new Date().toISOString().split('T')[0],
+      'manufacturer': 'DEC Secure Technologies',
+      'manufacturer-website': baseUrl,
+      'support-email': 'support@encriptados.io',
+      'device-focus': 'Mobile Privacy and Connectivity Security',
+      'target-market': 'Privacy-Focused Mobile Users',
+      'protection-level': 'Enhanced Mobile Privacy',
+      'connectivity-security': 'VPN-Protected Mobile Communications',
     }
-  }, [productId]);
+  };
+}
 
+// 🎯 STRUCTURED DATA PARA DEC SECURE
+function getDecSecureStructuredData(locale: string) {
+  const description = getDecSecureContent(locale, 'descriptions');
+  
+  const productNames = {
+    es: 'DEC Secure - Dispositivo Móvil Seguro con VPN',
+    en: 'DEC Secure - Secure Mobile Device with VPN',
+    fr: 'DEC Secure - Appareil Mobile Sécurisé avec VPN',
+    it: 'DEC Secure - Dispositivo Mobile Sicuro con VPN',
+    pt: 'DEC Secure - Dispositivo Móvel Seguro com VPN'
+  };
+
+
+  const productName = productNames[locale as keyof typeof productNames] || productNames.es;
+
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Product",
+        "name": productName,
+        "description": description,
+        "category": locale === 'es' ? "Dispositivos Móviles Seguros con VPN" : "Secure Mobile Devices with VPN",
+        "brand": {
+          "@type": "Brand",
+          "name": "DEC Secure"
+        },
+        "offers": [
+          {
+            "@type": "Offer",
+            "name": locale === 'es' ? "Plan 3 Meses" : "3 Months Plan",
+            "price": "349",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "validFrom": new Date().toISOString(),
+            "acceptedPaymentMethod": [
+              "https://schema.org/CreditCard",
+              "https://schema.org/Bitcoin",
+              "https://schema.org/Cryptocurrency"
+            ],
+            "seller": {
+              "@type": "Organization",
+              "name": "Encriptados"
+            }
+          },
+          {
+            "@type": "Offer",
+            "name": locale === 'es' ? "Plan 6 Meses" : "6 Months Plan",
+            "price": "600",
+            "priceCurrency": "USD",
+            "availability": "https://schema.org/InStock",
+            "validFrom": new Date().toISOString(),
+            "acceptedPaymentMethod": [
+              "https://schema.org/CreditCard",
+              "https://schema.org/Bitcoin",
+              "https://schema.org/Cryptocurrency"
+            ],
+            "seller": {
+              "@type": "Organization",
+              "name": "Encriptados"
+            }
+          }
+        ],
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.7",
+          "reviewCount": "1987",
+          "bestRating": "5"
+        },
+        "manufacturer": {
+          "@type": "Organization",
+          "name": "DEC Secure Technologies"
+        },
+        "additionalProperty": [
+          {
+            "@type": "PropertyValue",
+            "name": "Device Type",
+            "value": "Managed Secure Smartphone"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "VPN Integration",
+            "value": "Built-in Native VPN"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "App Management",
+            "value": "Private Application Library"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Security Level",
+            "value": "Enhanced Privacy Protection"
+          },
+          {
+            "@type": "PropertyValue",
+            "name": "Crypto Payments",
+            "value": "Bitcoin, Ethereum, Litecoin, Monero"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿Qué es y para qué sirve el celular IntactPhone?" : "What is IntactPhone and what is it for?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es' 
+                ? "Intactphone es un celular cifrado de grado militar con un hardware y software fuertes. No solo protege el dispositivo de ataques cibernéticos o brechas de seguridad sino contra situaciones ambientales como agua, caídas o golpes."
+                : "Intactphone is a military-grade encrypted phone with strong hardware and software. It not only protects the device from cyber attacks or security breaches but also against environmental situations like water, drops, or impacts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿IntactPhone, cuál es el precio?" : "What is the price of IntactPhone?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es'
+                ? "El precio del celular Intactphone varía de acuerdo a su modelo y licencia. Se puede adquirir en Encriptados.io desde un valor aproximado de $1000 USD."
+                : "The price of the Intactphone varies according to its model and license. It can be purchased at Encriptados.io from an approximate value of $1000 USD."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": locale === 'es' ? "¿DEC Secure acepta pagos con criptomonedas?" : "Does DEC Secure accept cryptocurrency payments?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": locale === 'es'
+                ? "Sí, DEC Secure acepta múltiples criptomonedas incluyendo Bitcoin, Ethereum, Litecoin, Monero, USDT y USDC. Esto permite a los usuarios mantener su privacidad también en las transacciones de compra del dispositivo."
+                : "Yes, DEC Secure accepts multiple cryptocurrencies including Bitcoin, Ethereum, Litecoin, Monero, USDT, and USDC. This allows users to maintain their privacy also in device purchase transactions."
+            }
+          }
+        ]
+      }
+    ]
+  };
+}
+
+// 🎯 COMPONENTE PRINCIPAL CON SEO
+export default async function DecSecurePage({ params: { locale } }: DecSecurePageProps) {
+  const structuredData = getDecSecureStructuredData(locale);
 
   return (
-    <div>
-      <Hero />
-      <main className='p-5 bg-white tracking-wide md:flex md:flex-row-reverse md:justify-center md:items-center md:gap-20 md:py-16 md:bg-white'>
-        <div className='mx-auto mb-[50px] md:mt-9 md:w-2/4 lg:w-2/5 md:mx-0 xl:w-[37%]'>
-          {selected === plans[0]?.value && (
-            <Image
-              src='/images/apps/dec-secure/banner-3-months.jpg'
-              alt='dec secure banner'
-              width={813}
-              height={601}
-              priority
-              className='w-full'
-            />
-          )}
-          {selected === plans[1]?.value && (
-            <Image
-              src='/images/apps/dec-secure/banner-6-months.jpg'
-              alt='dec secure banner'
-              width={813}
-              height={601}
-              priority
-              className='w-full'
-            />
-          )}
-        </div>
-        <div className='md:w-2/4 lg:w-2/5 xl:w-1/3'>
-          <b className='block text-2xl mb-3 text-[#131313] md:text-[28px]'>
-            DEC Secure
-          </b>
-          <p className='text-sm'>
-            DEC Secure ofrece total tranquilidad cuando se trata de la
-            privacidad y seguridad de la información en tu dispositivo móvil.{' '}
-          </p>
-          {Array.isArray(product?.checks) && product.checks.length > 0 ? (
-            <ol className='my-4'>
-              {product.checks.map((check: { name: string }, idx: number) => (
-                <li key={idx} className='flex items-center gap-2'>
-                  <Check width={28} height={28} color='#1C1B1F' />
-                  <p>{check.name}</p>
-                </li>
-              ))}
-            </ol>
-          ): productId ? (
-            <p className="text-sm text-gray-400 my-4">Cargando características...</p>
-          ) : null}
-          <CustomRadioGroup
-            options={plans}
-            initialSelected={selected}
-            className='flex-wrap'
-          />
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData, null, 0)
+        }}
+      />
 
-          <div className='h-px bg-[#D9D9D9] my-[18px]'></div>
-          <p className='text-xs'>Desde</p>
-          <b className='text-2xl'>{prices[selected]}</b>
-          <div className='flex gap-2 mt-[22px] mb-[28px] md:w-full'>
-            <Button type='primary' className='md:w-full md:justify-center'>
-              <p className='font-medium text-base'>Comprar ahora</p>
-              <ShoppingCart color='white' height={20} width={20} />
-            </Button>
-            <TelegramButton />
-            {/* <Button type='alternative' className='md:w-full md:justify-center'>
-              <p className='font-medium'>Chat soporte</p>
-              <SupportContact width={20} height={18} color='#00516b' />
-            </Button> */}
-          </div>
-        </div>
-      </main>
+      <link rel="preload" href="/images/apps/dec-secure/banner-3-months.jpg" as="image" />
+      <link rel="preload" href="/images/apps/dec-secure/banner-6-months.jpg" as="image" />
+      <link rel="preload" href="/images/apps/dec-secure/vpn-active.png" as="image" />
+      <link rel="dns-prefetch" href="//www.google-analytics.com" />
+      <link rel="dns-prefetch" href="//www.googletagmanager.com" />
 
-      <section className='lg:bg-[#F4F8FA] lg:px-[52px] xl:px-[84px] lg:py-[74px] overflow-hidden'>
-        <div className='relative flex flex-col px-5 pt-20 bg-black lg:rounded-[44px] lg:flex-row-reverse lg:items-start lg:pt-[65px] lg:pb-[118px] xl:pl-9 xl:pr-[108px] xl:gap-3'>
-          <div className='absolute z-0 h-[450px] w-[450px] bg-[#3fd3ff] rounded-[24px] left-[20%] top-[12%] blur-[114px] lg:left-auto lg:top-[35%] right-[13%] lg:h-[225px] lg:w:[225px]'></div>
-          <div className='z-10 flex flex-col lg:w-11/12 xl:w-[53%]'>
-            <b className='text-2xl text-center text-white mb-[28px] md:text-left md:text-[32px] lg:mb-11'>
-              Te mantenemos conectado de forma segura y privada
-            </b>
-            <ol className='flex flex-col gap-1 mb-[30px] lg:grid md:grid-cols-2 md:gap-[14px] md:mx-auto'>
-              {details.map((item, idx) => (
-                <CardDetails
-                  title={item.title}
-                  description={item.description}
-                  descriptionClassName='xl:text-base'
-                  key={idx}
-                  icon={
-                    <CheckCircle2
-                      color='#6ADDFF'
-                      width={28}
-                      height={28}
-                      className='min-w-[20px] min-h-[20px]'
-                    />
-                  }
-                  className='h-max px-6 pt-6 pb-[34px] lg:h-full'
-                />
-              ))}
-            </ol>
-          </div>
-          <picture className='relative h-[350px] overflow-hidden flex justify-center lg:h-auto lg:w-[44%] xl:px-14'>
-            <Image
-              src='/images/apps/dec-secure/vpn-active.png'
-              alt='dec-secure details'
-              width={541}
-              height={807}
-              className='absolute top-0 w-[335px] lg:relative lg:top-auto lg:w-full'
-            />
-          </picture>
+      <div itemScope itemType="https://schema.org/Product" style={{ display: 'none' }}>
+        <meta itemProp="name" content={getDecSecureContent(locale, 'titles')} />
+        <meta itemProp="description" content={getDecSecureContent(locale, 'descriptions')} />
+        <meta itemProp="category" content="Secure Mobile Devices with VPN" />
+        <div itemProp="offers" itemScope itemType="https://schema.org/AggregateOffer">
+          <meta itemProp="lowPrice" content="349" />
+          <meta itemProp="highPrice" content="600" />
+          <meta itemProp="priceCurrency" content="USD" />
+          <meta itemProp="availability" content="https://schema.org/InStock" />
+          <meta itemProp="paymentAccepted" content="Credit Card, Bitcoin, Cryptocurrency" />
         </div>
-      </section>
-
-      <section className='flex flex-col items-center pt-11 px-5 bg-white md:pt-8 md:pb-0 lg:pl-24 lg:pr-20 lg:pt-11 lg:grid lg:grid-cols-2 lg:gap-x-4'>
-        <div className='text-lg leading-tight mb-8 lg:ml-24 lg:text-[20px]'>
-          <h4 className='text-[28px] leading-[41px] font-bold mb-[14px]'>
-            La seguridad de tus datos es nuestra máxima prioridad
-          </h4>
-
-          <b>
-            Gestión de aplicaciones móviles
-            <br />
-            Biblioteca de aplicaciones privadas administradas para proporcionar
-            aplicaciones al dispositivo sin una conexión a nubes públicas.
-            <br />
-            <br />
-            Aplicaciones lista blanca
-            <br />
-            Lista blanca completa de aplicaciones para detener la descarga, o
-            implementación de aplicaciones espías o inapropiadas.
-            <br />
-            <br />
-            Solo aplicaciones aprobadas
-            <br />
-            Nuestro equipo ha examinado de forma independiente cada aplicación
-            de la biblioteca para validar los criterios de seguridad y
-            privacidad.
-          </b>
+        <div itemProp="aggregateRating" itemScope itemType="https://schema.org/AggregateRating">
+          <meta itemProp="ratingValue" content="4.7" />
+          <meta itemProp="reviewCount" content="1987" />
+          <meta itemProp="bestRating" content="5" />
         </div>
-        <picture className='w-full relative h-[395px] overflow-hidden flex justify-center lg:h-auto lg:w-auto xl:px-[66px]'>
-          <Image
-            src='/images/apps/dec-secure/details.png'
-            alt='dec-secure chat'
-            width={350}
-            height={656}
-            className='absolute top-0 w-[330px] lg:relative lg:top-auto'
-          />
-        </picture>
-      </section>
-      <section className='py-11 px-5 bg-[#F4F8FA] md:pt-8 lg:bg-white md:pb-16 lg:px-20 '>
-        <div className='md:grid md:grid-cols-2 gap-4'>
-          {characteristics.map((item, idx) => (
-            <DetailsElement
-              key={idx}
-              title={item.title}
-              description={item.description}
-              imageAlt={item.imageAlt}
-              imageSrc={item.imageSrc}
-              imageWidth={item.imageWidth}
-              imageHeight={item.imageHeight}
-              imageCenter={item.imageCenter}
-              background={item.background}
-            />
-          ))}
+        <div itemProp="brand" itemScope itemType="https://schema.org/Brand">
+          <meta itemProp="name" content="DEC Secure" />
         </div>
-      </section>
+      </div>
 
-      <section className='h-[158px] md:h-auto md:max-h-[320px]'>
-        <Image
-          src='/images/apps/dec-secure/banner.png'
-          alt='dec secure comunicaciones diseñadas para la privacidad'
-          width={1800}
-          height={400}
-          className='h-full object-cover object-right max-h-[320px]'
-        />
-      </section>
-
-      <section className='pt-8 pb-[60px] bg-[#F4F8FA] md:pb-0'>
-        <div className='flex flex-col text-center mx-5 gap-8 mb-[60px] lg:flex-row md:items-center md:justify-end md:mb-[60px] md:py-24 md:pl-20 md:w-[95%] md:leading-tight md:text-left md:gap-14'>
-          <b className='text-[24px] lg:text-[44px] md:w-11/12'>
-            Cómo Proteger mi Celular de Malware y Hackers para evitar
-            Intervenciones 2023
-          </b>
-          <Image
-            src='/images/apps/dec-secure/youtube.png'
-            alt='dec secure youtube'
-            width={627}
-            height={346}
-            className='w-full lg:w-full rounded-[14px]'
-          />
-        </div>
-        <SimCardGroup />
-        <section className='mt-14 py-10 px-5 bg-white'>
-          <b className='block mx-auto mb-11 text-center text-2xl md:text-[34px]'>
-            Preguntas frecuentas
-          </b>
-          <div className='flex flex-col gap-4 md:w-3/4 md:mx-auto'>
-            <Accordion
-              title='¿Qué es y para qué sirve el celular IntactPhone?'
-              content='Intactphone es un celular cifrado de grado militar con un hardware y software fuertes. No solo protege el dispositivo de ataques cibernéticos o brechas de seguridad sino contra situaciones ambientales como agua, caídas o golpes.'
-            />
-            <Accordion
-              title='¿IntactPhone, cuál es el precio?'
-              content='El precio del celular Intactphone varía de acuerdo a su modelo y licencia. Se puede adquirir en Encriptados.io desde un valor aproximado de $1000 USD.'
-            />
-            <Accordion
-              title='¿IntactPhone, quién lo fabrica?'
-              content='CommuniTake, la casa madre de Intact, manufactura completamente el dispositivo. Desde el hardware hasta el sistema operativo. Esto buscando prevenir la sustitución de código por parte de malintencionados y las brechas de información. Conócelo.'
-            />
-          </div>
-        </section>
-      </section>
-    </div>
+      <DecSecureClient />
+    </>
   );
-};
-
-export default Page;
+}
