@@ -1,0 +1,28 @@
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://encriptados.io/sitemap.xml
+Sitemap: https://encriptados.io/en/sitemap.xml
+Sitemap: https://encriptados.io/fr/sitemap.xml
+Sitemap: https://encriptados.io/it/sitemap.xml
+Sitemap: https://encriptados.io/pt/sitemap.xml
+
+# Allow important pages
+Allow: /apps/
+Allow: /blog/
+Allow: /distributors/
+Allow: /deliveries/
+Allow: /offers/
+Allow: /encrypted-test/
+Allow: /tim-sim/
+
+# Disallow admin areas
+Disallow: /admin/
+Disallow: /api/
+Disallow: /_next/
+Disallow: /checkout/
+Disallow: /payment/
+
+# Crawl-delay
+Crawl-delay: 1
